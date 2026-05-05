@@ -1,18 +1,18 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://rm8fg0vmodua"]
 
-[ext_resource type="Script" path="res://scripts/main.gd" id="1"]
+[ext_resource type="Script" uid="uid://dsc7ujnj3pg4j" path="res://scripts/main.gd" id="1"]
 
-[node name="Main" type="Node2D"]
+[node name="Main" type="Node2D" unique_id=325692335]
 script = ExtResource("1")
 
-[node name="WorldBackground" type="ColorRect" parent="."]
+[node name="WorldBackground" type="ColorRect" parent="." unique_id=788326907]
 offset_right = 1280.0
 offset_bottom = 720.0
 color = Color(0.11, 0.14, 0.11, 1)
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1742487758]
 
-[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer"]
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer" unique_id=550919902]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -23,21 +23,42 @@ offset_bottom = -24.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MarginContainer" unique_id=1397048668]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="SceneTitle" type="Label" parent="CanvasLayer/MarginContainer/VBoxContainer"]
+[node name="DayLabel" type="Label" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=619635660]
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
-text = "Cena principal"
 
-[node name="InfoLabel" type="Label" parent="CanvasLayer/MarginContainer/VBoxContainer"]
+[node name="TimeLabel" type="Label" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=1524779479]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Aqui você pode começar a montar a gameplay do jogo."
 
-[node name="BackButton" type="Button" parent="CanvasLayer/MarginContainer/VBoxContainer"]
-custom_minimum_size = Vector2(220, 48)
+[node name="ResourcesLabel" type="Label" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=726859582]
 layout_mode = 2
-text = "Voltar ao menu"
+
+[node name="PatientLabel" type="Label" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=1824338365]
+layout_mode = 2
+
+[node name="SymptomsLabel" type="Label" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=1232414875]
+layout_mode = 2
+
+[node name="DiaryButton" type="Button" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=1423436638]
+layout_mode = 2
+
+[node name="MedicineButton" type="Button" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=1482012444]
+layout_mode = 2
+
+[node name="HerbsButton" type="Button" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=1654502444]
+layout_mode = 2
+
+[node name="CreateMedicineButton" type="Button" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=231406992]
+layout_mode = 2
+
+[node name="RefuseButton" type="Button" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=360058895]
+layout_mode = 2
+
+[node name="RestButton" type="Button" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=571949939]
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=2002851590]
+layout_mode = 2
