@@ -29,36 +29,60 @@ theme_override_constants/separation = 16
 
 [node name="DayLabel" type="Label" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=619635660]
 layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Dia"
 
 [node name="TimeLabel" type="Label" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=1524779479]
 layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Horário"
 
 [node name="ResourcesLabel" type="Label" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=726859582]
 layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Recursos"
 
 [node name="PatientLabel" type="Label" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=1824338365]
 layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Paciente"
 
 [node name="SymptomsLabel" type="Label" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=1232414875]
 layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Sintomas"
 
 [node name="DiaryButton" type="Button" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=1423436638]
+custom_minimum_size = Vector2(260, 42)
 layout_mode = 2
+text = "Ver diário"
 
 [node name="MedicineButton" type="Button" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=1482012444]
+custom_minimum_size = Vector2(260, 42)
 layout_mode = 2
+text = "Aplicar medicamento"
 
 [node name="HerbsButton" type="Button" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=1654502444]
+custom_minimum_size = Vector2(260, 42)
 layout_mode = 2
+text = "Usar ervas"
 
 [node name="CreateMedicineButton" type="Button" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=231406992]
+custom_minimum_size = Vector2(260, 42)
 layout_mode = 2
+text = "Criar medicamento"
 
 [node name="RefuseButton" type="Button" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=360058895]
+custom_minimum_size = Vector2(260, 42)
 layout_mode = 2
+text = "Recusar atendimento"
 
 [node name="RestButton" type="Button" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=571949939]
+custom_minimum_size = Vector2(260, 42)
 layout_mode = 2
+text = "Descansar"
 
 [node name="BackButton" type="Button" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=2002851590]
+custom_minimum_size = Vector2(260, 42)
 layout_mode = 2
+text = "Voltar ao menu"

@@ -56,11 +56,11 @@ func _update_ui(_value = null) -> void:
 		var patient := GameState.current_patient
 
 		patient_label.text = "Paciente: %s\n%s" % [
-			patient.name,
-			patient.description
+			patient["name"],
+			patient["description"]
 		]
 
-		symptoms_label.text = "Sintomas: %s" % ", ".join(patient.symptoms)
+		symptoms_label.text = "Sintomas: %s" % ", ".join(patient["symptoms"])
 
 		var already_treated: bool = patient.get("treated", false)
 		_set_patient_buttons_enabled(not already_treated)
