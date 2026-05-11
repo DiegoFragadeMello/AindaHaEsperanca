@@ -16,19 +16,8 @@ extends Node2D
 
 
 func _ready() -> void:
-	diary_button.pressed.connect(_on_diary_pressed)
-	medicine_button.pressed.connect(_on_medicine_pressed)
-	herbs_button.pressed.connect(_on_herbs_pressed)
-	create_medicine_button.pressed.connect(_on_create_medicine_pressed)
-	refuse_button.pressed.connect(_on_refuse_pressed)
-	rest_button.pressed.connect(_on_rest_pressed)
-	back_button.pressed.connect(_on_back_pressed)
-
-	GameState.day_changed.connect(_update_ui)
-	GameState.time_changed.connect(_update_ui)
-	GameState.resources_changed.connect(_update_ui)
-	GameState.patient_changed.connect(_update_ui)
-
+	_connect_button_signals()
+	_connect_game_state_signals()
 	_update_ui()
 
 
@@ -37,33 +26,60 @@ func _process(_delta: float) -> void:
 		_on_back_pressed()
 
 
+func _connect_button_signals() -> void:
+	if not diary_button.pressed.is_connected(_on_diary_pressed):
+		diary_button.pressed.connect(_on_diary_pressed)
+	if not medicine_button.pressed.is_connected(_on_medicine_pressed):
+		medicine_button.pressed.connect(_on_medicine_pressed)
+	if not herbs_button.pressed.is_connected(_on_herbs_pressed):
+		herbs_button.pressed.connect(_on_herbs_pressed)
+	if not create_medicine_button.pressed.is_connected(_on_create_medicine_pressed):
+		create_medicine_button.pressed.connect(_on_create_medicine_pressed)
+	if not refuse_button.pressed.is_connected(_on_refuse_pressed):
+		refuse_button.pressed.connect(_on_refuse_pressed)
+	if not rest_button.pressed.is_connected(_on_rest_pressed):
+		rest_button.pressed.connect(_on_rest_pressed)
+	if not back_button.pressed.is_connected(_on_back_pressed):
+		back_button.pressed.connect(_on_back_pressed)
+
+
+func _connect_game_state_signals() -> void:
+	if not GameState.day_changed.is_connected(_update_ui):
+		GameState.day_changed.connect(_update_ui)
+	if not GameState.time_changed.is_connected(_update_ui):
+		GameState.time_changed.connect(_update_ui)
+	if not GameState.resources_changed.is_connected(_update_ui):
+		GameState.resources_changed.connect(_update_ui)
+	if not GameState.patient_changed.is_connected(_update_ui):
+		GameState.patient_changed.connect(_update_ui)
+
+
 func _update_ui(_value = null) -> void:
 	day_label.text = "Dia %d" % GameState.current_day
 	time_label.text = "Horário: %02d:00" % GameState.current_hour
 
+	var resources := GameState.get_resources()
 	resources_label.text = "Ervas: %d | Remédios: %d | Comida: %d | Esperança: %d" % [
-		GameState.herbs,
-		GameState.medicine,
-		GameState.food,
-		GameState.hope
+		int(resources.get(ResourceManager.HERBS, 0)),
+		int(resources.get(ResourceManager.MEDICINE, 0)),
+		int(resources.get(ResourceManager.FOOD, 0)),
+		int(resources.get(ResourceManager.HOPE, 0))
 	]
 
-	if GameState.current_patient.is_empty():
+	var patient: Patient = GameState.get_current_patient()
+	if patient == null:
 		patient_label.text = "Nenhum paciente aguardando."
 		symptoms_label.text = ""
 		_set_patient_buttons_enabled(false)
-	else:
-		var patient := GameState.current_patient
+		return
 
-		patient_label.text = "Paciente: %s\n%s" % [
-			patient["name"],
-			patient["description"]
-		]
+	patient_label.text = "Paciente: %s\n%s" % [
+		patient.patient_name,
+		patient.description
+	]
 
-		symptoms_label.text = "Sintomas: %s" % ", ".join(patient["symptoms"])
-
-		var already_treated: bool = patient.get("treated", false)
-		_set_patient_buttons_enabled(not already_treated)
+	symptoms_label.text = "Sintomas: %s" % ", ".join(patient.symptoms)
+	_set_patient_buttons_enabled(not patient.was_treated)
 
 
 func _set_patient_buttons_enabled(enabled: bool) -> void:
@@ -77,11 +93,11 @@ func _on_diary_pressed() -> void:
 
 
 func _on_medicine_pressed() -> void:
-	GameState.treat_current_patient("medicine")
+	GameState.treat_current_patient(ResourceManager.MEDICINE)
 
 
 func _on_herbs_pressed() -> void:
-	GameState.treat_current_patient("herbs")
+	GameState.treat_current_patient(ResourceManager.HERBS)
 
 
 func _on_create_medicine_pressed() -> void:
