@@ -29,10 +29,14 @@ func _ready() -> void:
 
 
 func _connect_game_state_signals() -> void:
-	GameState.day_changed.connect(_update_ui)
-	GameState.time_changed.connect(_update_ui)
-	GameState.resources_changed.connect(_update_ui)
-	GameState.patient_changed.connect(_update_ui)
+	if not GameState.day_changed.is_connected(_update_ui):
+		GameState.day_changed.connect(_update_ui)
+	if not GameState.time_changed.is_connected(_update_ui):
+		GameState.time_changed.connect(_update_ui)
+	if not GameState.resources_changed.is_connected(_update_ui):
+		GameState.resources_changed.connect(_update_ui)
+	if not GameState.patient_changed.is_connected(_update_ui):
+		GameState.patient_changed.connect(_update_ui)
 
 
 func _process(_delta: float) -> void:

@@ -4,6 +4,8 @@ extends Node
 signal patient_changed(patient: Patient)
 signal queue_empty
 
+const DEFAULT_PATIENTS_PATH := "res://data/characters/patients.json"
+
 var current_patient: Patient = null
 var patient_queue: Array[Patient] = []
 var treated_patients: Array[Patient] = []
@@ -18,11 +20,22 @@ func reset() -> void:
 	patient_changed.emit(null)
 
 
+func load_patients_from_json(day: int, path: String = DEFAULT_PATIENTS_PATH) -> void:
+	var data := JsonDataLoader.load_json(path)
+	var days: Dictionary = data.get("days", {})
+	var day_data: Array = days.get(str(day), [])
+	load_patients_for_day(day_data)
+
+
 func load_patients_for_day(day_data: Array) -> void:
 	patient_queue.clear()
 	current_patient = null
 
 	for data in day_data:
+		if typeof(data) != TYPE_DICTIONARY:
+			push_warning("Paciente ignorado: entrada inválida no JSON.")
+			continue
+
 		var patient: Patient = Patient.from_dict(data)
 		patient_queue.append(patient)
 

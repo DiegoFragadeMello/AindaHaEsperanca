@@ -1,0 +1,41 @@
+{
+  "members": {
+    "pai": {
+      "name": "Senhor Silver",
+      "age": 52,
+      "role": "pai",
+      "health": 80,
+      "state": "saudável",
+      "trust": 50,
+      "description": "O chefe da família Silver. Tenta manter a casa funcionando, mesmo quando a vila começa a ruir."
+    },
+    "filho": {
+      "name": "Bart Silver",
+      "age": 16,
+      "role": "filho adolescente",
+      "health": 45,
+      "state": "acamado",
+      "trust": 35,
+      "description": "O filho adolescente da família Silver. Está doente desde antes da chegada do médico."
+    },
+    "filha": {
+      "name": "Lisa Silver",
+      "age": 9,
+      "role": "filha criança",
+      "health": 70,
+      "state": "assustada",
+      "faith": 70,
+      "trust": 40,
+      "description": "A filha mais nova da família Silver. Observa tudo em silêncio e entende mais do que deveria."
+    },
+    "avo": {
+      "name": "Vovô Silver",
+      "age": 78,
+      "role": "avô",
+      "health": 60,
+      "state": "frágil",
+      "trust": 60,
+      "description": "O avô da família Silver. Conhece histórias antigas sobre outras pragas em Santa Clara."
+    }
+  }
+}
