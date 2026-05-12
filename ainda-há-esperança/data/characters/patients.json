@@ -1,0 +1,89 @@
+{
+  "days": {
+    "1": [
+      {
+        "name": "Nara Machado",
+        "age": 34,
+        "family_name": "Machado",
+        "occupation": "Costureira",
+        "description": "Uma mulher cansada chega pedindo ervas para tratar o pai.",
+        "symptoms": ["febre", "tosse", "fraqueza"],
+        "severity": 35,
+        "correct_treatment": "herbs",
+        "introduction_dialogue": "Doutor... meu pai não para de tossir. Agora eu também sinto a febre."
+      }
+    ],
+    "2": [
+      {
+        "name": "Seu Antônio Ferreira",
+        "age": 71,
+        "family_name": "Ferreira",
+        "occupation": "Pescador aposentado",
+        "description": "Um homem idoso chega tremendo, com manchas escuras nos braços.",
+        "symptoms": ["calafrios", "manchas", "delírio"],
+        "severity": 55,
+        "correct_treatment": "medicine"
+      }
+    ],
+    "3": [
+      {
+        "name": "Clara Mendes",
+        "age": 22,
+        "family_name": "Carvalho",
+        "occupation": "Aprendiz de escriba",
+        "description": "Uma jovem procura ajuda depois de perder quase toda a família.",
+        "symptoms": ["febre alta", "dor no peito", "fraqueza"],
+        "severity": 70,
+        "correct_treatment": "medicine"
+      }
+    ],
+    "4": [
+      {
+        "name": "Tomás",
+        "age": 41,
+        "family_name": "Machado",
+        "occupation": "Pescador",
+        "description": "Um pescador robusto, mas com os olhos fundos de quem não dorme há dias.",
+        "symptoms": ["insônia", "tosse seca", "dor de cabeça"],
+        "severity": 40,
+        "correct_treatment": "herbs"
+      }
+    ],
+    "5": [
+      {
+        "name": "Dona Perpétua",
+        "age": 58,
+        "family_name": "Ferreira",
+        "occupation": "Padeira",
+        "description": "A padeira da vila. Chegou apoiada na porta, mal conseguindo ficar de pé.",
+        "symptoms": ["fraqueza extrema", "vômito", "febre"],
+        "severity": 65,
+        "correct_treatment": "medicine"
+      }
+    ],
+    "6": [
+      {
+        "name": "Menino desconhecido",
+        "age": 8,
+        "family_name": "",
+        "occupation": "",
+        "description": "Uma criança sem nome, trazida por um vizinho. Ninguém sabe de onde veio.",
+        "symptoms": ["manchas roxas", "delírio", "febre alta"],
+        "severity": 80,
+        "correct_treatment": "medicine"
+      }
+    ],
+    "7": [
+      {
+        "name": "Padre Alves",
+        "age": 64,
+        "family_name": "Alves",
+        "occupation": "Padre",
+        "description": "O último homem de fé da vila. Veio até você antes de ir embora para sempre.",
+        "symptoms": ["tosse com sangue", "fraqueza", "dor no peito"],
+        "severity": 75,
+        "correct_treatment": "medicine"
+      }
+    ]
+  }
+}

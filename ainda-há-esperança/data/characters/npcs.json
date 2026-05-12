@@ -1,0 +1,10 @@
+{
+  "npcs": {
+    "mercador": {
+      "name": "Mercador Misterioso",
+      "role": "mercador",
+      "description": "Um visitante recorrente que oferece ingredientes e medicamentos em troca de dinheiro. Ninguém sabe exatamente de onde ele vem.",
+      "trust": 20
+    }
+  }
+}
