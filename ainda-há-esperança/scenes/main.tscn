@@ -23,66 +23,96 @@ offset_bottom = -24.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MarginContainer" unique_id=1397048668]
+[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = 16
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 1
 
-[node name="DayLabel" type="Label" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=619635660]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MarginContainer/ScrollContainer" unique_id=1397048668]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "Dia"
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
 
-[node name="TimeLabel" type="Label" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=1524779479]
+[node name="DayLabel" type="Label" parent="CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer" unique_id=619635660]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Horário"
+theme_override_font_sizes/font_size = 26
+text = "Dia 1 de 7"
 
-[node name="ResourcesLabel" type="Label" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=726859582]
+[node name="TimeLabel" type="Label" parent="CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer" unique_id=1524779479]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Recursos"
+theme_override_font_sizes/font_size = 17
+text = "Horário: 07:00"
 
-[node name="PatientLabel" type="Label" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=1824338365]
+[node name="ResourcesLabel" type="Label" parent="CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer" unique_id=726859582]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 16
+autowrap_mode = 2
+text = "Artemísia: 10 | Valeriana: 10 | Sálvia: 10"
+
+[node name="PatientLabel" type="Label" parent="CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer" unique_id=1824338365]
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+autowrap_mode = 2
 text = "Paciente"
 
-[node name="SymptomsLabel" type="Label" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=1232414875]
+[node name="SymptomsLabel" type="Label" parent="CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer" unique_id=1232414875]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 16
+autowrap_mode = 2
 text = "Sintomas"
 
-[node name="DiaryButton" type="Button" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=1423436638]
-custom_minimum_size = Vector2(260, 42)
+[node name="MixtureLabel" type="Label" parent="CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+autowrap_mode = 2
+text = "Mistura: 0 Artemísia | 0 Valeriana | 0 Sálvia (0/3)"
+
+[node name="DiaryButton" type="Button" parent="CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer" unique_id=1423436638]
+custom_minimum_size = Vector2(260, 38)
 layout_mode = 2
 text = "Ver diário"
 
-[node name="MedicineButton" type="Button" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=1482012444]
-custom_minimum_size = Vector2(260, 42)
+[node name="MedicineButton" type="Button" parent="CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer" unique_id=1482012444]
+custom_minimum_size = Vector2(260, 38)
 layout_mode = 2
-text = "Aplicar medicamento"
+text = "Adicionar artemísia"
 
-[node name="HerbsButton" type="Button" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=1654502444]
-custom_minimum_size = Vector2(260, 42)
+[node name="HerbsButton" type="Button" parent="CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer" unique_id=1654502444]
+custom_minimum_size = Vector2(260, 38)
 layout_mode = 2
-text = "Usar ervas"
+text = "Adicionar valeriana"
 
-[node name="CreateMedicineButton" type="Button" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=231406992]
-custom_minimum_size = Vector2(260, 42)
+[node name="CreateMedicineButton" type="Button" parent="CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer" unique_id=231406992]
+custom_minimum_size = Vector2(260, 38)
 layout_mode = 2
-text = "Criar medicamento"
+text = "Adicionar sálvia"
 
-[node name="RefuseButton" type="Button" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=360058895]
-custom_minimum_size = Vector2(260, 42)
+[node name="ApplyMixtureButton" type="Button" parent="CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(260, 38)
+layout_mode = 2
+text = "Aplicar mistura"
+
+[node name="ClearMixtureButton" type="Button" parent="CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(260, 38)
+layout_mode = 2
+text = "Limpar mistura"
+
+[node name="RefuseButton" type="Button" parent="CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer" unique_id=360058895]
+custom_minimum_size = Vector2(260, 38)
 layout_mode = 2
 text = "Recusar atendimento"
 
-[node name="RestButton" type="Button" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=571949939]
-custom_minimum_size = Vector2(260, 42)
+[node name="CollectHerbsButton" type="Button" parent="CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(260, 38)
+layout_mode = 2
+text = "Coletar ervas"
+
+[node name="RestButton" type="Button" parent="CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer" unique_id=571949939]
+custom_minimum_size = Vector2(260, 38)
 layout_mode = 2
 text = "Descansar"
 
-[node name="BackButton" type="Button" parent="CanvasLayer/MarginContainer/VBoxContainer" unique_id=2002851590]
-custom_minimum_size = Vector2(260, 42)
+[node name="BackButton" type="Button" parent="CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer" unique_id=2002851590]
+custom_minimum_size = Vector2(260, 38)
 layout_mode = 2
 text = "Voltar ao menu"

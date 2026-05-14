@@ -1,7 +1,7 @@
 extends Control
 
 @onready var title_label: Label = $MarginContainer/VBoxContainer/TitleLabel
-@onready var diary_text: RichTextLabel = $MarginContainer/VBoxContainer/DiaryText
+@onready var diary_text: RichTextLabel = $MarginContainer/VBoxContainer/ScrollContainer/DiaryText
 @onready var continue_button: Button = $MarginContainer/VBoxContainer/ContinueButton
 
 
@@ -11,7 +11,7 @@ func _ready() -> void:
 
 
 func _update_diary() -> void:
-	title_label.text = "Diário - Dia %d" % GameState.current_day
+	title_label.text = "Diário"
 
 	var full_text := ""
 
@@ -23,4 +23,8 @@ func _update_diary() -> void:
 
 
 func _on_continue_pressed() -> void:
+	if GameState.current_day >= GameState.time_manager.max_days:
+		get_tree().change_scene_to_file("res://scenes/menu.tscn")
+		return
+
 	get_tree().change_scene_to_file("res://scenes/main.tscn")

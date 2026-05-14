@@ -55,16 +55,17 @@ func call_next_patient() -> Patient:
 	return current_patient
 
 
-func treat_current_patient(treatment_name: String, effectiveness: int) -> Patient.HealthState:
+func treat_current_patient_with_herbs(recipe_name: String, outcome: String) -> Patient.HealthState:
 	if current_patient == null:
 		return Patient.HealthState.WAITING
 
 	var treated_patient := current_patient
-	var result: Patient.HealthState = treated_patient.apply_treatment(treatment_name, effectiveness)
+	var result: Patient.HealthState = treated_patient.apply_herbal_treatment(recipe_name, outcome)
 
 	match result:
-		Patient.HealthState.RECOVERED, Patient.HealthState.STABILIZED, Patient.HealthState.WORSENED, Patient.HealthState.STABLE, Patient.HealthState.WORSE, Patient.HealthState.CRITICAL:
+		Patient.HealthState.RECOVERED, Patient.HealthState.STABILIZED, Patient.HealthState.WORSENED, Patient.HealthState.STABLE, Patient.HealthState.WEAK, Patient.HealthState.CRITICAL:
 			treated_patients.append(treated_patient)
+
 		Patient.HealthState.DEAD:
 			dead_patients.append(treated_patient)
 
@@ -79,7 +80,9 @@ func refuse_current_patient() -> void:
 
 	current_patient.current_health_state = Patient.HealthState.WORSENED
 	current_patient.was_treated = false
+
 	treated_patients.append(current_patient)
+
 	current_patient = null
 	call_next_patient()
 
@@ -87,11 +90,13 @@ func refuse_current_patient() -> void:
 func progress_all_patients() -> void:
 	for patient in patient_queue:
 		patient.progress_disease()
+
 		if patient.current_health_state == Patient.HealthState.DEAD and not dead_patients.has(patient):
 			dead_patients.append(patient)
 
 	if current_patient != null:
 		current_patient.progress_disease()
+
 		if current_patient.current_health_state == Patient.HealthState.DEAD and not dead_patients.has(current_patient):
 			dead_patients.append(current_patient)
 

@@ -11,7 +11,6 @@ extends Node
 @export var correct_treatment: String = ""
 @export var severity: int = 0
 
-@export var health: int = 100
 @export var stress: int = 0
 @export var infection_level: int = 0
 
@@ -27,7 +26,7 @@ extends Node
 enum HealthState {
 	WAITING,
 	STABLE,
-	WORSE,
+	WEAK,
 	CRITICAL,
 	DEAD,
 	RECOVERED,
@@ -43,28 +42,41 @@ var is_waiting: bool = true
 
 static func from_dict(data: Dictionary) -> Patient:
 	var patient := Patient.new()
+
 	patient.patient_name = str(data.get("name", data.get("patient_name", "Unknown")))
 	patient.age = int(data.get("age", 0))
 	patient.occupation = str(data.get("occupation", ""))
 	patient.description = str(data.get("description", ""))
+
 	patient.disease_name = str(data.get("disease_name", ""))
 	patient.symptoms.assign(data.get("symptoms", []))
 	patient.correct_treatment = str(data.get("correct_treatment", ""))
 	patient.severity = int(data.get("severity", 0))
-	patient.health = int(data.get("health", clamp(100 - patient.severity, 20, 100)))
+
 	patient.stress = int(data.get("stress", 0))
 	patient.infection_level = int(data.get("infection_level", patient.severity))
+
 	patient.family_name = str(data.get("family_name", ""))
 	patient.importance_level = int(data.get("importance_level", 0))
 	patient.trusts_doctor = int(data.get("trusts_doctor", 50))
+
 	patient.introduction_dialogue = str(data.get("introduction_dialogue", ""))
 	patient.examination_dialogue = str(data.get("examination_dialogue", ""))
 	patient.death_dialogue = str(data.get("death_dialogue", ""))
 	patient.cured_dialogue = str(data.get("cured_dialogue", ""))
-	patient.current_health_state = HealthState.WAITING
-	patient.update_health_state()
+
+	patient.current_health_state = patient._get_initial_health_state_from_severity(patient.severity)
 	patient.is_waiting = true
+
 	return patient
+
+
+func _get_initial_health_state_from_severity(value: int) -> HealthState:
+	if value >= 80:
+		return HealthState.CRITICAL
+	if value >= 45:
+		return HealthState.WEAK
+	return HealthState.STABLE
 
 
 func examine() -> Array[String]:
@@ -72,74 +84,141 @@ func examine() -> Array[String]:
 	return symptoms
 
 
-func apply_treatment(treatment_name: String, effectiveness: int = 0) -> HealthState:
+func apply_herbal_treatment(recipe_name: String, outcome: String) -> HealthState:
 	was_treated = true
 	is_waiting = false
 
-	var treatment_matches := correct_treatment == "" or treatment_name == correct_treatment
-	var final_effectiveness := effectiveness
+	match outcome:
+		"good":
+			_apply_good_outcome()
 
-	if treatment_matches:
-		final_effectiveness += 10
-	else:
-		final_effectiveness -= 15
+		"neutral":
+			_apply_neutral_outcome()
 
-	if final_effectiveness >= severity:
-		heal()
-		return current_health_state
+		"bad":
+			_apply_bad_outcome()
 
-	if final_effectiveness >= int(severity * 0.5):
-		stabilize(final_effectiveness)
-		return current_health_state
+		"deadly":
+			_apply_deadly_outcome()
 
-	worsen()
+		_:
+			_apply_bad_outcome()
+
 	return current_health_state
 
 
-func heal() -> void:
-	current_health_state = HealthState.RECOVERED
-	health = 100
-	infection_level = 0
+func _apply_good_outcome() -> void:
+	match current_health_state:
+		HealthState.CRITICAL:
+			current_health_state = HealthState.STABILIZED
+		HealthState.WEAK:
+			current_health_state = HealthState.RECOVERED
+		HealthState.STABLE:
+			current_health_state = HealthState.RECOVERED
+		HealthState.WORSENED:
+			current_health_state = HealthState.STABILIZED
+		HealthState.STABILIZED:
+			current_health_state = HealthState.RECOVERED
+		HealthState.WAITING:
+			current_health_state = HealthState.RECOVERED
+
+	infection_level = max(0, infection_level - 20)
+	stress = max(0, stress - 5)
 
 
-func stabilize(effectiveness: int = 0) -> void:
-	current_health_state = HealthState.STABILIZED
-	health = clamp(health + max(5, effectiveness / 2), 1, 100)
-	infection_level = max(0, infection_level - effectiveness)
+func _apply_neutral_outcome() -> void:
+	match current_health_state:
+		HealthState.CRITICAL:
+			current_health_state = HealthState.STABILIZED
+		HealthState.WEAK:
+			current_health_state = HealthState.STABILIZED
+		HealthState.STABLE:
+			current_health_state = HealthState.STABLE
+		HealthState.WORSENED:
+			current_health_state = HealthState.STABILIZED
+		HealthState.WAITING:
+			current_health_state = HealthState.STABLE
+
+	infection_level = max(0, infection_level - 5)
 
 
-func worsen() -> void:
-	infection_level += 25
-	health -= 30
+func _apply_bad_outcome() -> void:
+	match current_health_state:
+		HealthState.STABLE:
+			current_health_state = HealthState.WEAK
+		HealthState.WEAK:
+			current_health_state = HealthState.CRITICAL
+		HealthState.CRITICAL:
+			die()
+			return
+		HealthState.STABILIZED:
+			current_health_state = HealthState.WORSENED
+		HealthState.WORSENED:
+			current_health_state = HealthState.CRITICAL
+		HealthState.WAITING:
+			current_health_state = HealthState.WEAK
+
+	infection_level += 15
 	stress += 10
-	update_health_state()
-	if current_health_state != HealthState.DEAD:
-		current_health_state = HealthState.WORSENED
+
+
+func _apply_deadly_outcome() -> void:
+	match current_health_state:
+		HealthState.CRITICAL, HealthState.WORSENED:
+			die()
+		_:
+			current_health_state = HealthState.CRITICAL
+
+	infection_level += 30
+	stress += 20
 
 
 func progress_disease() -> void:
 	if current_health_state in [HealthState.DEAD, HealthState.RECOVERED]:
 		return
 
+	match current_health_state:
+		HealthState.STABLE:
+			current_health_state = HealthState.WEAK
+		HealthState.WEAK:
+			current_health_state = HealthState.CRITICAL
+		HealthState.CRITICAL:
+			die()
+		HealthState.STABILIZED:
+			current_health_state = HealthState.WEAK
+		HealthState.WORSENED:
+			current_health_state = HealthState.CRITICAL
+		HealthState.WAITING:
+			current_health_state = HealthState.WEAK
+
 	infection_level += 10
-	health -= 15
-	update_health_state()
-
-
-func update_health_state() -> void:
-	if health <= 0:
-		die()
-	elif health <= 25:
-		current_health_state = HealthState.CRITICAL
-	elif health <= 60:
-		current_health_state = HealthState.WORSE
-	elif current_health_state != HealthState.WAITING:
-		current_health_state = HealthState.STABLE
+	stress += 5
 
 
 func die() -> void:
 	current_health_state = HealthState.DEAD
-	health = 0
+
+
+func get_health_state_text() -> String:
+	match current_health_state:
+		HealthState.WAITING:
+			return "Aguardando atendimento"
+		HealthState.STABLE:
+			return "Estável"
+		HealthState.WEAK:
+			return "Debilitado"
+		HealthState.CRITICAL:
+			return "Crítico"
+		HealthState.DEAD:
+			return "Morto"
+		HealthState.RECOVERED:
+			return "Recuperado"
+		HealthState.STABILIZED:
+			return "Estabilizado"
+		HealthState.WORSENED:
+			return "Piorou"
+
+	return "Estado desconhecido"
 
 
 func get_patient_summary() -> Dictionary:
@@ -149,8 +228,8 @@ func get_patient_summary() -> Dictionary:
 		"occupation": occupation,
 		"description": description,
 		"disease": disease_name,
-		"health": health,
 		"state": current_health_state,
+		"state_text": get_health_state_text(),
 		"symptoms": symptoms,
 		"treated": was_treated,
 		"examined": was_examined,

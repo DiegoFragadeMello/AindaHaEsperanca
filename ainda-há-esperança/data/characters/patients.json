@@ -7,9 +7,9 @@
         "family_name": "Machado",
         "occupation": "Costureira",
         "description": "Uma mulher cansada chega pedindo ervas para tratar o pai.",
+        "disease_name": "tosse_negra",
         "symptoms": ["febre", "tosse", "fraqueza"],
         "severity": 35,
-        "correct_treatment": "herbs",
         "introduction_dialogue": "Doutor... meu pai não para de tossir. Agora eu também sinto a febre."
       }
     ],
@@ -20,9 +20,9 @@
         "family_name": "Ferreira",
         "occupation": "Pescador aposentado",
         "description": "Um homem idoso chega tremendo, com manchas escuras nos braços.",
+        "disease_name": "delirio_febril",
         "symptoms": ["calafrios", "manchas", "delírio"],
-        "severity": 55,
-        "correct_treatment": "medicine"
+        "severity": 55
       }
     ],
     "3": [
@@ -32,9 +32,9 @@
         "family_name": "Carvalho",
         "occupation": "Aprendiz de escriba",
         "description": "Uma jovem procura ajuda depois de perder quase toda a família.",
+        "disease_name": "febre_putrida",
         "symptoms": ["febre alta", "dor no peito", "fraqueza"],
-        "severity": 70,
-        "correct_treatment": "medicine"
+        "severity": 70
       }
     ],
     "4": [
@@ -44,9 +44,9 @@
         "family_name": "Machado",
         "occupation": "Pescador",
         "description": "Um pescador robusto, mas com os olhos fundos de quem não dorme há dias.",
+        "disease_name": "tosse_negra",
         "symptoms": ["insônia", "tosse seca", "dor de cabeça"],
-        "severity": 40,
-        "correct_treatment": "herbs"
+        "severity": 40
       }
     ],
     "5": [
@@ -56,9 +56,9 @@
         "family_name": "Ferreira",
         "occupation": "Padeira",
         "description": "A padeira da vila. Chegou apoiada na porta, mal conseguindo ficar de pé.",
+        "disease_name": "febre_putrida",
         "symptoms": ["fraqueza extrema", "vômito", "febre"],
-        "severity": 65,
-        "correct_treatment": "medicine"
+        "severity": 65
       }
     ],
     "6": [
@@ -68,9 +68,9 @@
         "family_name": "",
         "occupation": "",
         "description": "Uma criança sem nome, trazida por um vizinho. Ninguém sabe de onde veio.",
+        "disease_name": "delirio_febril",
         "symptoms": ["manchas roxas", "delírio", "febre alta"],
-        "severity": 80,
-        "correct_treatment": "medicine"
+        "severity": 80
       }
     ],
     "7": [
@@ -80,9 +80,9 @@
         "family_name": "Alves",
         "occupation": "Padre",
         "description": "O último homem de fé da vila. Veio até você antes de ir embora para sempre.",
+        "disease_name": "tosse_negra",
         "symptoms": ["tosse com sangue", "fraqueza", "dor no peito"],
-        "severity": 75,
-        "correct_treatment": "medicine"
+        "severity": 75
       }
     ]
   }

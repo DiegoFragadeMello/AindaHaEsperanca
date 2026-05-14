@@ -10,26 +10,70 @@ signal patient_changed(patient: Patient)
 const PATIENTS_JSON_PATH := "res://data/characters/patients.json"
 const FAMILY_JSON_PATH := "res://data/characters/family.json"
 
-const TREATMENT_EFFECTIVENESS := {
-	ResourceManager.MEDICINE: 30,
-	ResourceManager.HERBS: 15,
+const DISEASE_HERBAL_EFFECTS := {
+	"febre_putrida": {
+		"artemisia:2|valeriana:1|salvia:0": {
+			"display_name": "infusão febril de artemísia e valeriana",
+			"outcome": "good",
+		},
+		"artemisia:1|valeriana:1|salvia:1": {
+			"display_name": "mistura equilibrada de três ervas",
+			"outcome": "neutral",
+		},
+		"artemisia:0|valeriana:2|salvia:1": {
+			"display_name": "mistura pesada de raiz-de-valeriana",
+			"outcome": "bad",
+		},
+	},
+
+	"tosse_negra": {
+		"artemisia:1|valeriana:0|salvia:2": {
+			"display_name": "tônico amargo de sálvia",
+			"outcome": "good",
+		},
+		"artemisia:1|valeriana:1|salvia:1": {
+			"display_name": "mistura equilibrada de três ervas",
+			"outcome": "neutral",
+		},
+		"artemisia:3|valeriana:0|salvia:0": {
+			"display_name": "preparado forte de artemísia-cinzenta",
+			"outcome": "bad",
+		},
+	},
+
+	"delirio_febril": {
+		"artemisia:0|valeriana:2|salvia:1": {
+			"display_name": "sedativo de valeriana com sálvia",
+			"outcome": "good",
+		},
+		"artemisia:1|valeriana:1|salvia:1": {
+			"display_name": "mistura equilibrada de três ervas",
+			"outcome": "neutral",
+		},
+		"artemisia:0|valeriana:0|salvia:3": {
+			"display_name": "decocção intensa de sálvia-da-febre",
+			"outcome": "bad",
+		},
+	},
 }
 
 var diary_entries: Array[String] = []
+
+var current_day_actions: Array[String] = []
+var current_day_patient_results: Array[String] = []
 
 var patient_manager: PatientManager
 var resource_manager: ResourceManager
 var time_manager: TimeManager
 var family_manager: FamilyManager
 
-# Variáveis espelho para manter compatibilidade com UIs/scripts existentes.
 var current_day: int = 1
 var current_hour: int = 7
-var medicine: int = 0
-var herbs: int = 0
-var hope: int = 0
-var food: int = 0
-var money: int = 0
+
+var artemisia: int = 0
+var valeriana: int = 0
+var salvia: int = 0
+
 var current_patient: Patient = null
 var family: Dictionary = {}
 
@@ -86,17 +130,25 @@ func _setup_managers() -> void:
 
 func start_new_game() -> void:
 	_setup_managers()
+
 	time_manager.reset()
 	resource_manager.reset()
 	patient_manager.reset()
 	family_manager.load_from_json(FAMILY_JSON_PATH)
+
 	diary_entries.clear()
+	current_day_actions.clear()
+	current_day_patient_results.clear()
+
 	_sync_time_mirror()
 	_sync_resources_mirror()
 	_sync_family_mirror()
+
 	_load_patients_for_current_day()
+
 	resources_changed.emit()
 	family_changed.emit()
+
 	get_tree().change_scene_to_file("res://scenes/main.tscn")
 
 
@@ -110,7 +162,7 @@ func _on_patient_changed(patient: Patient) -> void:
 
 
 func _on_queue_empty() -> void:
-	add_diary_entry("Não há mais pacientes hoje. A vila guarda silêncio.")
+	current_day_actions.append("Atendi todos os pacientes que chegaram até mim.")
 
 
 func _on_resources_changed(_resources: Dictionary) -> void:
@@ -144,6 +196,7 @@ func _on_game_days_finished() -> void:
 func _sync_time_mirror() -> void:
 	if time_manager == null:
 		return
+
 	current_day = time_manager.current_day
 	current_hour = time_manager.current_hour
 
@@ -151,65 +204,126 @@ func _sync_time_mirror() -> void:
 func _sync_resources_mirror() -> void:
 	if resource_manager == null:
 		return
-	medicine = resource_manager.medicine
-	herbs = resource_manager.herbs
-	hope = resource_manager.hope
-	food = resource_manager.food
-	money = resource_manager.money
+
+	artemisia = resource_manager.artemisia
+	valeriana = resource_manager.valeriana
+	salvia = resource_manager.salvia
 
 
 func _sync_family_mirror() -> void:
 	if family_manager == null:
 		return
+
 	family = family_manager.get_snapshot()
 
 
-func treat_current_patient(treatment_type: String) -> void:
+func treat_current_patient_with_combination(combination: Dictionary) -> void:
+	if not patient_manager.has_current_patient():
+		return
+
+	var total_herbs := 0
+
+	for herb_name in combination.keys():
+		total_herbs += int(combination[herb_name])
+
+	if total_herbs != 3:
+		add_diary_entry("Tentei preparar uma mistura, mas errei a proporção. Preciso usar exatamente três porções de ervas.")
+		return
+
+	if not resource_manager.consume_herb_combination(combination):
+		current_day_actions.append("Tentei preparar uma mistura, mas minhas ervas não foram suficientes.")
+		add_diary_entry("Tentei preparar uma mistura, mas minhas ervas não foram suficientes.")
+		return
+
+	var patient: Patient = patient_manager.current_patient
+	var disease_id := _normalize_disease_name(patient.disease_name)
+	var combination_key := _get_combination_key(combination)
+
+	var effect_data := _get_effect_for_disease_and_combination(disease_id, combination_key)
+
+	var mixture_name := str(effect_data["display_name"])
+	var outcome := str(effect_data["outcome"])
+
+	var result: Patient.HealthState = patient_manager.treat_current_patient_with_herbs(mixture_name, outcome)
+
+	current_day_actions.append(
+		"Preparei %s para %s usando %s." % [
+			mixture_name,
+			patient.patient_name,
+			_describe_combination(combination),
+		]
+	)
+
+	_register_patient_result_by_outcome(patient, result, outcome)
+	advance_time(3)
+
+
+func _register_patient_result_by_outcome(patient: Patient, result: Patient.HealthState, outcome: String) -> void:
+	match result:
+		Patient.HealthState.RECOVERED:
+			current_day_patient_results.append(
+				"%s se recuperou após a mistura. Pela primeira vez no dia, senti que minhas mãos ainda podiam salvar alguém." % patient.patient_name
+			)
+
+		Patient.HealthState.STABILIZED:
+			current_day_patient_results.append(
+				"%s ficou estável. A doença não cedeu por completo, mas consegui afastá-la da beira do abismo." % patient.patient_name
+			)
+
+		Patient.HealthState.STABLE:
+			current_day_patient_results.append(
+				"%s permaneceu estável. Não sei se foi mérito da mistura ou simples sorte." % patient.patient_name
+			)
+
+		Patient.HealthState.WEAK:
+			current_day_patient_results.append(
+				"%s ficou debilitado. A mistura não parece ter sido suficiente." % patient.patient_name
+			)
+
+		Patient.HealthState.WORSENED:
+			current_day_patient_results.append(
+				"%s piorou depois do tratamento. Talvez eu tenha confundido os sinais da doença." % patient.patient_name
+			)
+
+		Patient.HealthState.CRITICAL:
+			current_day_patient_results.append(
+				"%s terminou em estado crítico. Passei o resto do dia temendo que não visse a manhã seguinte." % patient.patient_name
+			)
+
+		Patient.HealthState.DEAD:
+			current_day_patient_results.append(
+				"%s morreu sob meus cuidados. Escrevo seu nome aqui para que eu não esqueça o peso da minha escolha." % patient.patient_name
+			)
+
+
+func refuse_current_patient() -> void:
 	if not patient_manager.has_current_patient():
 		return
 
 	var patient: Patient = patient_manager.current_patient
+	patient_manager.refuse_current_patient()
 
-	match treatment_type:
-		ResourceManager.MEDICINE:
-			if not resource_manager.consume_resource(ResourceManager.MEDICINE):
-				add_diary_entry("Tentei usar remédio, mas não havia nenhum disponível.")
-				return
-			_resolve_and_log(patient, treatment_type, TREATMENT_EFFECTIVENESS[ResourceManager.MEDICINE])
-			advance_time(3)
+	current_day_actions.append("Recusei atender %s." % patient.patient_name)
+	current_day_patient_results.append(
+		"%s partiu sem tratamento, e não sei se sobreviverá à noite." % patient.patient_name
+	)
 
-		ResourceManager.HERBS:
-			if not resource_manager.consume_resource(ResourceManager.HERBS):
-				add_diary_entry("Tentei usar ervas, mas o estoque estava vazio.")
-				return
-			_resolve_and_log(patient, treatment_type, TREATMENT_EFFECTIVENESS[ResourceManager.HERBS])
-			advance_time(3)
-
-		"refuse":
-			resource_manager.add_resource(ResourceManager.HOPE, -5)
-			patient_manager.refuse_current_patient()
-			add_diary_entry("Recusei atendimento a %s." % patient.patient_name)
-			advance_time(1)
-
-		_:
-			push_warning("Tipo de tratamento desconhecido: %s" % treatment_type)
+	advance_time(1)
 
 
-func _resolve_and_log(patient: Patient, treatment_name: String, effectiveness: int) -> void:
-	var result: Patient.HealthState = patient_manager.treat_current_patient(treatment_name, effectiveness)
+func collect_herbs() -> void:
+	resource_manager.collect_herbs()
 
-	match result:
-		Patient.HealthState.RECOVERED:
-			resource_manager.add_resource(ResourceManager.HOPE, 5)
-			add_diary_entry("%s se recuperou após o tratamento." % patient.patient_name)
-		Patient.HealthState.STABILIZED, Patient.HealthState.STABLE:
-			add_diary_entry("%s foi estabilizado, ao menos por enquanto." % patient.patient_name)
-		Patient.HealthState.WORSENED, Patient.HealthState.WORSE, Patient.HealthState.CRITICAL:
-			resource_manager.add_resource(ResourceManager.HOPE, -5)
-			add_diary_entry("%s piorou apesar da tentativa de tratamento." % patient.patient_name)
-		Patient.HealthState.DEAD:
-			resource_manager.add_resource(ResourceManager.HOPE, -10)
-			add_diary_entry("%s não resistiu." % patient.patient_name)
+	current_day_actions.append(
+		"Saí para coletar ervas nos arredores da vila e trouxe um pouco de cada planta."
+	)
+
+	advance_time(2)
+
+
+func rest() -> void:
+	current_day_actions.append("Tentei descansar por algumas horas antes de continuar.")
+	advance_time(2)
 
 
 func advance_time(hours: int) -> void:
@@ -219,10 +333,16 @@ func advance_time(hours: int) -> void:
 
 func end_day() -> void:
 	patient_manager.progress_all_patients()
-	_apply_night_consequences()
 
-	if resource_manager.get_resource(ResourceManager.HOPE) <= 0:
-		end_game()
+	_register_waiting_patients_at_day_end()
+	_write_day_summary(current_day)
+
+	current_day_actions.clear()
+	current_day_patient_results.clear()
+
+	if current_day >= time_manager.max_days:
+		_write_final_week_summary()
+		get_tree().change_scene_to_file("res://scenes/diary.tscn")
 		return
 
 	if not time_manager.start_next_day():
@@ -230,36 +350,56 @@ func end_day() -> void:
 
 	_sync_time_mirror()
 	_load_patients_for_current_day()
+
 	get_tree().change_scene_to_file("res://scenes/diary.tscn")
 
 
-func _apply_night_consequences() -> void:
-	if not resource_manager.consume_resource(ResourceManager.FOOD):
-		resource_manager.set_resource(ResourceManager.FOOD, 0)
-		resource_manager.add_resource(ResourceManager.HOPE, -5)
-		family_manager.change_health("filho", -5)
-		add_diary_entry("A fome pesou sobre a casa durante a noite.")
+func _register_waiting_patients_at_day_end() -> void:
+	for patient in patient_manager.patient_queue:
+		if patient.current_health_state == Patient.HealthState.DEAD:
+			current_day_patient_results.append(
+				"%s não resistiu enquanto aguardava atendimento." % patient.patient_name
+			)
+		else:
+			current_day_patient_results.append(
+				"%s terminou o dia ainda aguardando, em estado incerto." % patient.patient_name
+			)
 
-	var filho := family_manager.get_member("filho")
-	if int(filho.get("health", 100)) <= 20:
-		family_manager.set_member_value("filho", "state", "grave")
-		add_diary_entry("Bart piorou. Sua respiração parece mais fraca.")
+	if patient_manager.current_patient != null:
+		var patient: Patient = patient_manager.current_patient
+
+		if patient.current_health_state == Patient.HealthState.DEAD:
+			current_day_patient_results.append(
+				"%s morreu antes que eu pudesse decidir o que fazer." % patient.patient_name
+			)
+		else:
+			current_day_patient_results.append(
+				"%s permaneceu sem tratamento até o cair da noite." % patient.patient_name
+			)
 
 
-func create_medicine() -> void:
-	if not resource_manager.consume_resource(ResourceManager.HERBS, 2):
-		add_diary_entry("Tentei sintetizar remédio, mas faltavam ervas.")
-		return
+func _write_day_summary(day_finished: int) -> void:
+	var text := "Diário - Dia %d\n\n" % day_finished
+	text += "Hoje foi mais um dia pesado durante a peste.\n\n"
 
-	resource_manager.add_resource(ResourceManager.MEDICINE, 1)
-	add_diary_entry("Usei ervas amargas para preparar um novo medicamento.")
-	advance_time(2)
+	if current_day_actions.is_empty():
+		text += "Quase nada pude fazer. O silêncio da casa pesou mais do que os gritos da vila.\n\n"
+	else:
+		text += "Minhas ações:\n"
+		for action in current_day_actions:
+			text += "- %s\n" % action
+		text += "\n"
 
+	if current_day_patient_results.is_empty():
+		text += "Nenhum paciente ficou sob meus cuidados hoje.\n"
+	else:
+		text += "Sobre os pacientes:\n"
+		for result in current_day_patient_results:
+			text += "- %s\n" % result
 
-func rest() -> void:
-	resource_manager.add_resource(ResourceManager.HOPE, 2)
-	add_diary_entry("Tentei repousar, mas a culpa não me deixou dormir em paz.")
-	advance_time(2)
+	text += "\nTermino o dia cansado, com as mãos manchadas pelo cheiro das ervas e pela dúvida do que fiz."
+
+	add_diary_entry(text)
 
 
 func get_resource(resource_name: String) -> int:
@@ -278,24 +418,16 @@ func get_family_member(member_id: String) -> Dictionary:
 	return family_manager.get_member(member_id)
 
 
-func get_hope() -> int:
-	return resource_manager.hope
+func get_artemisia() -> int:
+	return resource_manager.artemisia
 
 
-func get_food() -> int:
-	return resource_manager.food
+func get_valeriana() -> int:
+	return resource_manager.valeriana
 
 
-func get_herbs() -> int:
-	return resource_manager.herbs
-
-
-func get_medicine() -> int:
-	return resource_manager.medicine
-
-
-func get_money() -> int:
-	return resource_manager.money
+func get_salvia() -> int:
+	return resource_manager.salvia
 
 
 func add_diary_entry(text: String) -> void:
@@ -314,18 +446,114 @@ func get_save_data() -> Dictionary:
 
 func load_save_data(data: Dictionary) -> void:
 	_setup_managers()
+
 	time_manager.load_snapshot(data.get("time", {}))
 	resource_manager.load_snapshot(data.get("resources", {}))
 	diary_entries.assign(data.get("diary_entries", []))
 	family_manager.load_snapshot(data.get("family", {}))
+
 	_sync_time_mirror()
 	_sync_resources_mirror()
 	_sync_family_mirror()
+
 	_load_patients_for_current_day()
+
 	diary_updated.emit()
 	family_changed.emit()
 
 
 func end_game() -> void:
-	add_diary_entry("A história chegou ao fim.")
-	get_tree().change_scene_to_file("res://scenes/end_game.tscn")
+	_write_final_week_summary()
+	get_tree().change_scene_to_file("res://scenes/diary.tscn")
+
+func _get_effect_for_disease_and_combination(disease_id: String, combination_key: String) -> Dictionary:
+	var disease_effects: Dictionary = DISEASE_HERBAL_EFFECTS.get(disease_id, {})
+
+	if disease_effects.has(combination_key):
+		return disease_effects[combination_key]
+
+	return {
+		"display_name": "mistura desconhecida",
+		"outcome": "bad",
+	}
+
+
+func _normalize_disease_name(disease_name: String) -> String:
+	var normalized := disease_name.to_lower()
+	normalized = normalized.strip_edges()
+	normalized = normalized.replace(" ", "_")
+	normalized = normalized.replace("á", "a")
+	normalized = normalized.replace("à", "a")
+	normalized = normalized.replace("ã", "a")
+	normalized = normalized.replace("â", "a")
+	normalized = normalized.replace("é", "e")
+	normalized = normalized.replace("ê", "e")
+	normalized = normalized.replace("í", "i")
+	normalized = normalized.replace("ó", "o")
+	normalized = normalized.replace("ô", "o")
+	normalized = normalized.replace("õ", "o")
+	normalized = normalized.replace("ú", "u")
+	normalized = normalized.replace("ç", "c")
+	return normalized
+
+
+func _get_combination_key(combination: Dictionary) -> String:
+	var artemisia_amount := int(combination.get(ResourceManager.ARTEMISIA, 0))
+	var valeriana_amount := int(combination.get(ResourceManager.VALERIANA, 0))
+	var salvia_amount := int(combination.get(ResourceManager.SALVIA, 0))
+
+	return "artemisia:%d|valeriana:%d|salvia:%d" % [
+		artemisia_amount,
+		valeriana_amount,
+		salvia_amount,
+	]
+
+
+func _describe_combination(combination: Dictionary) -> String:
+	var parts: Array[String] = []
+
+	var artemisia_amount := int(combination.get(ResourceManager.ARTEMISIA, 0))
+	var valeriana_amount := int(combination.get(ResourceManager.VALERIANA, 0))
+	var salvia_amount := int(combination.get(ResourceManager.SALVIA, 0))
+
+	if artemisia_amount > 0:
+		parts.append("%d Artemísia-cinzenta" % artemisia_amount)
+
+	if valeriana_amount > 0:
+		parts.append("%d Raiz-de-valeriana" % valeriana_amount)
+
+	if salvia_amount > 0:
+		parts.append("%d Sálvia-da-febre" % salvia_amount)
+
+	return ", ".join(parts)
+
+func _write_final_week_summary() -> void:
+	var dead_count := patient_manager.get_dead_count()
+	var treated_count := patient_manager.get_treated_count()
+	var score := _calculate_final_score(dead_count)
+
+	var text := "Diário - Fim da Semana\n\n"
+	text += "Sete dias se passaram desde que comecei a atender os doentes desta vila.\n\n"
+
+	text += "Ao reler estas páginas, encontro manchas de ervas, nomes riscados às pressas e decisões que talvez eu nunca consiga justificar.\n\n"
+
+	text += "Ao todo, %d paciente(s) passaram pelas minhas mãos durante esta semana.\n" % treated_count
+	text += "%d paciente(s) morreram.\n\n" % dead_count
+
+	if dead_count == 0:
+		text += "Nenhum dos que atendi morreu. Não sei se isso foi ciência, sorte ou misericórdia, mas hoje consigo respirar sem sentir o mesmo peso no peito.\n\n"
+	elif dead_count <= 2:
+		text += "Perdi alguns pacientes. Seus rostos ainda me acompanham quando fecho os olhos, mas também houve aqueles que resistiram por causa das minhas escolhas.\n\n"
+	elif dead_count <= 4:
+		text += "Muitos morreram. Eu continuei preparando misturas, anotando sintomas e fingindo firmeza, mas a verdade é que a peste venceu mais vezes do que eu.\n\n"
+	else:
+		text += "A semana terminou como uma confissão de fracasso. Enterrei mais nomes do que salvei, e cada mistura errada parece continuar presa às minhas mãos.\n\n"
+
+	text += "Pontuação final: %d/100\n\n" % score
+	text += "Se alguém encontrar este diário, que saiba: eu tentei. Mesmo quando já não tinha certeza se tentar ainda era suficiente."
+
+	add_diary_entry(text)
+
+
+func _calculate_final_score(dead_count: int) -> int:
+	return clamp(100 - dead_count * 15, 0, 100)
