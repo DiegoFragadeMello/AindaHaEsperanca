@@ -452,14 +452,18 @@ func _describe_combination(combination: Dictionary) -> String:
 func _write_final_week_summary() -> void:
 	var dead_count := patient_manager.get_dead_count()
 	var treated_count := patient_manager.get_treated_count()
-	var score := _calculate_final_score(dead_count)
+	var refused_count := patient_manager.get_refused_count()
+	var resolved_count := patient_manager.get_resolved_count()
+	var score := _calculate_final_score(dead_count, refused_count)
 
 	var text := "Diário - Fim da Semana\n\n"
 	text += "Sete dias se passaram desde que comecei a atender os doentes desta vila.\n\n"
 
 	text += "Ao reler estas páginas, encontro manchas de ervas, nomes riscados às pressas e decisões que talvez eu nunca consiga justificar.\n\n"
 
-	text += "Ao todo, %d paciente(s) passaram pelas minhas mãos durante esta semana.\n" % treated_count
+	text += "Ao todo, %d paciente(s) passaram pela porta do consultório durante esta semana.\n" % resolved_count
+	text += "%d paciente(s) receberam algum tratamento.\n" % treated_count
+	text += "%d paciente(s) foram recusados.\n" % refused_count
 	text += "%d paciente(s) morreram.\n\n" % dead_count
 
 	if dead_count == 0:
@@ -477,5 +481,5 @@ func _write_final_week_summary() -> void:
 	add_diary_entry(text)
 
 
-func _calculate_final_score(dead_count: int) -> int:
-	return clamp(100 - dead_count * 15, 0, 100)
+func _calculate_final_score(dead_count: int, refused_count: int = 0) -> int:
+	return clamp(100 - dead_count * 15 - refused_count * 5, 0, 100)

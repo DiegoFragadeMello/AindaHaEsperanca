@@ -9,6 +9,7 @@ const DEFAULT_PATIENTS_PATH := "res://data/characters/patients.json"
 var current_patient: Patient = null
 var patient_queue: Array[Patient] = []
 var treated_patients: Array[Patient] = []
+var refused_patients: Array[Patient] = []
 var dead_patients: Array[Patient] = []
 
 
@@ -16,6 +17,7 @@ func reset() -> void:
 	current_patient = null
 	patient_queue.clear()
 	treated_patients.clear()
+	refused_patients.clear()
 	dead_patients.clear()
 	patient_changed.emit(null)
 
@@ -62,12 +64,10 @@ func treat_current_patient_with_herbs(recipe_name: String, outcome: String) -> P
 	var treated_patient := current_patient
 	var result: Patient.HealthState = treated_patient.apply_herbal_treatment(recipe_name, outcome)
 
-	match result:
-		Patient.HealthState.RECOVERED, Patient.HealthState.STABILIZED, Patient.HealthState.WORSENED, Patient.HealthState.STABLE, Patient.HealthState.WEAK, Patient.HealthState.CRITICAL:
-			treated_patients.append(treated_patient)
+	_add_unique_patient(treated_patients, treated_patient)
 
-		Patient.HealthState.DEAD:
-			dead_patients.append(treated_patient)
+	if result == Patient.HealthState.DEAD:
+		_add_unique_patient(dead_patients, treated_patient)
 
 	current_patient = null
 	call_next_patient()
@@ -78,10 +78,12 @@ func refuse_current_patient() -> void:
 	if current_patient == null:
 		return
 
-	current_patient.current_health_state = Patient.HealthState.WORSENED
-	current_patient.was_treated = false
+	var refused_patient := current_patient
+	refused_patient.current_health_state = Patient.HealthState.WORSENED
+	refused_patient.was_treated = false
+	refused_patient.is_waiting = false
 
-	treated_patients.append(current_patient)
+	_add_unique_patient(refused_patients, refused_patient)
 
 	current_patient = null
 	call_next_patient()
@@ -91,14 +93,14 @@ func progress_all_patients() -> void:
 	for patient in patient_queue:
 		patient.progress_disease()
 
-		if patient.current_health_state == Patient.HealthState.DEAD and not dead_patients.has(patient):
-			dead_patients.append(patient)
+		if patient.current_health_state == Patient.HealthState.DEAD:
+			_add_unique_patient(dead_patients, patient)
 
 	if current_patient != null:
 		current_patient.progress_disease()
 
-		if current_patient.current_health_state == Patient.HealthState.DEAD and not dead_patients.has(current_patient):
-			dead_patients.append(current_patient)
+		if current_patient.current_health_state == Patient.HealthState.DEAD:
+			_add_unique_patient(dead_patients, current_patient)
 
 
 func get_queue_count() -> int:
@@ -109,8 +111,35 @@ func get_treated_count() -> int:
 	return treated_patients.size()
 
 
+func get_refused_count() -> int:
+	return refused_patients.size()
+
+
 func get_dead_count() -> int:
 	return dead_patients.size()
+
+
+func get_resolved_count() -> int:
+	return treated_patients.size() + refused_patients.size()
+
+
+func get_patient_statistics() -> Dictionary:
+	return {
+		"treated": get_treated_count(),
+		"refused": get_refused_count(),
+		"dead": get_dead_count(),
+		"resolved": get_resolved_count(),
+		"waiting": get_queue_count(),
+		"has_current_patient": has_current_patient(),
+	}
+
+
+func _add_unique_patient(target: Array[Patient], patient: Patient) -> void:
+	if patient == null:
+		return
+
+	if not target.has(patient):
+		target.append(patient)
 
 
 func has_current_patient() -> bool:
