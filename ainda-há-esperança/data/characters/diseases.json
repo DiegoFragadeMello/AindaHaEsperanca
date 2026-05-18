@@ -1,0 +1,61 @@
+{
+  "diseases": {
+    "febre_putrida": {
+      "display_name": "Febre Pútrida",
+      "description": "Uma febre agressiva que consome rapidamente as forças do paciente.",
+      "symptoms": ["febre alta", "dor no peito", "fraqueza", "vômito"],
+      "recipes": {
+        "artemisia:2|valeriana:1|salvia:0": {
+          "display_name": "infusão febril de artemísia e valeriana",
+          "outcome": "good"
+        },
+        "artemisia:1|valeriana:1|salvia:1": {
+          "display_name": "mistura equilibrada de três ervas",
+          "outcome": "neutral"
+        },
+        "artemisia:0|valeriana:2|salvia:1": {
+          "display_name": "mistura pesada de raiz-de-valeriana",
+          "outcome": "bad"
+        }
+      }
+    },
+    "tosse_negra": {
+      "display_name": "Tosse Negra",
+      "description": "Doença respiratória marcada por tosse intensa, febre e fraqueza progressiva.",
+      "symptoms": ["febre", "tosse", "fraqueza", "tosse seca", "tosse com sangue"],
+      "recipes": {
+        "artemisia:1|valeriana:0|salvia:2": {
+          "display_name": "tônico amargo de sálvia",
+          "outcome": "good"
+        },
+        "artemisia:1|valeriana:1|salvia:1": {
+          "display_name": "mistura equilibrada de três ervas",
+          "outcome": "neutral"
+        },
+        "artemisia:3|valeriana:0|salvia:0": {
+          "display_name": "preparado forte de artemísia-cinzenta",
+          "outcome": "bad"
+        }
+      }
+    },
+    "delirio_febril": {
+      "display_name": "Delírio Febril",
+      "description": "Uma condição febril acompanhada de delírios, manchas e agitação.",
+      "symptoms": ["calafrios", "manchas", "delírio", "manchas roxas", "febre alta"],
+      "recipes": {
+        "artemisia:0|valeriana:2|salvia:1": {
+          "display_name": "sedativo de valeriana com sálvia",
+          "outcome": "good"
+        },
+        "artemisia:1|valeriana:1|salvia:1": {
+          "display_name": "mistura equilibrada de três ervas",
+          "outcome": "neutral"
+        },
+        "artemisia:0|valeriana:0|salvia:3": {
+          "display_name": "decocção intensa de sálvia-da-febre",
+          "outcome": "bad"
+        }
+      }
+    }
+  }
+}

@@ -10,52 +10,8 @@ signal patient_changed(patient: Patient)
 const PATIENTS_JSON_PATH := "res://data/characters/patients.json"
 const FAMILY_JSON_PATH := "res://data/characters/family.json"
 
-const DISEASE_HERBAL_EFFECTS := {
-	"febre_putrida": {
-		"artemisia:2|valeriana:1|salvia:0": {
-			"display_name": "infusão febril de artemísia e valeriana",
-			"outcome": "good",
-		},
-		"artemisia:1|valeriana:1|salvia:1": {
-			"display_name": "mistura equilibrada de três ervas",
-			"outcome": "neutral",
-		},
-		"artemisia:0|valeriana:2|salvia:1": {
-			"display_name": "mistura pesada de raiz-de-valeriana",
-			"outcome": "bad",
-		},
-	},
+const DISEASES_JSON_PATH := "res://data/characters/diseases.json"
 
-	"tosse_negra": {
-		"artemisia:1|valeriana:0|salvia:2": {
-			"display_name": "tônico amargo de sálvia",
-			"outcome": "good",
-		},
-		"artemisia:1|valeriana:1|salvia:1": {
-			"display_name": "mistura equilibrada de três ervas",
-			"outcome": "neutral",
-		},
-		"artemisia:3|valeriana:0|salvia:0": {
-			"display_name": "preparado forte de artemísia-cinzenta",
-			"outcome": "bad",
-		},
-	},
-
-	"delirio_febril": {
-		"artemisia:0|valeriana:2|salvia:1": {
-			"display_name": "sedativo de valeriana com sálvia",
-			"outcome": "good",
-		},
-		"artemisia:1|valeriana:1|salvia:1": {
-			"display_name": "mistura equilibrada de três ervas",
-			"outcome": "neutral",
-		},
-		"artemisia:0|valeriana:0|salvia:3": {
-			"display_name": "decocção intensa de sálvia-da-febre",
-			"outcome": "bad",
-		},
-	},
-}
 
 var diary_entries: Array[String] = []
 
@@ -66,6 +22,7 @@ var patient_manager: PatientManager
 var resource_manager: ResourceManager
 var time_manager: TimeManager
 var family_manager: FamilyManager
+var disease_manager: DiseaseManager
 
 var current_day: int = 1
 var current_hour: int = 7
@@ -80,6 +37,7 @@ var family: Dictionary = {}
 
 func _ready() -> void:
 	_setup_managers()
+	disease_manager.load_from_json(DISEASES_JSON_PATH)
 	_sync_time_mirror()
 	_sync_resources_mirror()
 	_sync_family_mirror()
@@ -110,6 +68,12 @@ func _setup_managers() -> void:
 		family_manager.name = "FamilyManager"
 		add_child(family_manager)
 
+	disease_manager = get_node_or_null("DiseaseManager") as DiseaseManager
+	if disease_manager == null:
+		disease_manager = DiseaseManager.new()
+		disease_manager.name = "DiseaseManager"
+		add_child(disease_manager)
+
 	if not patient_manager.patient_changed.is_connected(_on_patient_changed):
 		patient_manager.patient_changed.connect(_on_patient_changed)
 	if not patient_manager.queue_empty.is_connected(_on_queue_empty):
@@ -135,6 +99,7 @@ func start_new_game() -> void:
 	resource_manager.reset()
 	patient_manager.reset()
 	family_manager.load_from_json(FAMILY_JSON_PATH)
+	disease_manager.load_from_json(DISEASES_JSON_PATH)
 
 	diary_entries.clear()
 	current_day_actions.clear()
@@ -236,10 +201,7 @@ func treat_current_patient_with_combination(combination: Dictionary) -> void:
 		return
 
 	var patient: Patient = patient_manager.current_patient
-	var disease_id := _normalize_disease_name(patient.disease_name)
-	var combination_key := _get_combination_key(combination)
-
-	var effect_data := _get_effect_for_disease_and_combination(disease_id, combination_key)
+	var effect_data := disease_manager.get_effect_for_combination(patient.disease_name, combination)
 
 	var mixture_name := str(effect_data["display_name"])
 	var outcome := str(effect_data["outcome"])
@@ -451,6 +413,7 @@ func load_save_data(data: Dictionary) -> void:
 	resource_manager.load_snapshot(data.get("resources", {}))
 	diary_entries.assign(data.get("diary_entries", []))
 	family_manager.load_snapshot(data.get("family", {}))
+	disease_manager.load_from_json(DISEASES_JSON_PATH)
 
 	_sync_time_mirror()
 	_sync_resources_mirror()
@@ -466,47 +429,6 @@ func end_game() -> void:
 	_write_final_week_summary()
 	get_tree().change_scene_to_file("res://scenes/diary.tscn")
 
-func _get_effect_for_disease_and_combination(disease_id: String, combination_key: String) -> Dictionary:
-	var disease_effects: Dictionary = DISEASE_HERBAL_EFFECTS.get(disease_id, {})
-
-	if disease_effects.has(combination_key):
-		return disease_effects[combination_key]
-
-	return {
-		"display_name": "mistura desconhecida",
-		"outcome": "bad",
-	}
-
-
-func _normalize_disease_name(disease_name: String) -> String:
-	var normalized := disease_name.to_lower()
-	normalized = normalized.strip_edges()
-	normalized = normalized.replace(" ", "_")
-	normalized = normalized.replace("á", "a")
-	normalized = normalized.replace("à", "a")
-	normalized = normalized.replace("ã", "a")
-	normalized = normalized.replace("â", "a")
-	normalized = normalized.replace("é", "e")
-	normalized = normalized.replace("ê", "e")
-	normalized = normalized.replace("í", "i")
-	normalized = normalized.replace("ó", "o")
-	normalized = normalized.replace("ô", "o")
-	normalized = normalized.replace("õ", "o")
-	normalized = normalized.replace("ú", "u")
-	normalized = normalized.replace("ç", "c")
-	return normalized
-
-
-func _get_combination_key(combination: Dictionary) -> String:
-	var artemisia_amount := int(combination.get(ResourceManager.ARTEMISIA, 0))
-	var valeriana_amount := int(combination.get(ResourceManager.VALERIANA, 0))
-	var salvia_amount := int(combination.get(ResourceManager.SALVIA, 0))
-
-	return "artemisia:%d|valeriana:%d|salvia:%d" % [
-		artemisia_amount,
-		valeriana_amount,
-		salvia_amount,
-	]
 
 
 func _describe_combination(combination: Dictionary) -> String:
