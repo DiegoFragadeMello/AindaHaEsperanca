@@ -1,22 +1,27 @@
 extends Node2D
+@onready var day_label: Label = $CanvasLayer/DiaryPanel/LeftPage/DayLabel
+@onready var time_label: Label = $CanvasLayer/DiaryPanel/LeftPage/TimeLabel
+@onready var resources_label: Label = $CanvasLayer/DiaryPanel/LeftPage/ResourcesLabel
+@onready var patient_label: Label = $CanvasLayer/DiaryPanel/LeftPage/PatientLabel
+@onready var symptoms_label: Label = $CanvasLayer/DiaryPanel/LeftPage/SymptomsLabel
+@onready var mixture_label: Label = $CanvasLayer/DiaryPanel/LeftPage/MixtureLabel
 
-@onready var day_label: Label = $CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer/DayLabel
-@onready var time_label: Label = $CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer/TimeLabel
-@onready var resources_label: Label = $CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer/ResourcesLabel
-@onready var patient_label: Label = $CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer/PatientLabel
-@onready var symptoms_label: Label = $CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer/SymptomsLabel
-@onready var mixture_label: Label = $CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer/MixtureLabel
+@onready var diary_button: Button = $CanvasLayer/DiaryPanel/RightPage/DiaryButton
+@onready var add_artemisia_button: Button = $CanvasLayer/DiaryPanel/RightPage/MedicineButton
+@onready var add_valeriana_button: Button = $CanvasLayer/DiaryPanel/RightPage/HerbsButton
+@onready var add_salvia_button: Button = $CanvasLayer/DiaryPanel/RightPage/CreateMedicineButton
+@onready var apply_mixture_button: Button = $CanvasLayer/DiaryPanel/RightPage/ApplyMixtureButton
+@onready var clear_mixture_button: Button = $CanvasLayer/DiaryPanel/RightPage/ClearMixtureButton
+@onready var refuse_button: Button = $CanvasLayer/DiaryPanel/RightPage/RefuseButton
+@onready var collect_herbs_button: Button = $CanvasLayer/DiaryPanel/RightPage/CollectHerbsButton
+@onready var rest_button: Button = $CanvasLayer/DiaryPanel/RightPage/RestButton
+@onready var back_button: Button = $CanvasLayer/DiaryPanel/RightPage/BackButton
+@onready var action_menu: CanvasLayer = $CanvasLayer
+@onready var world_diary_button: TextureButton = $background/diaryButton
 
-@onready var diary_button: Button = $CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer/DiaryButton
-@onready var add_artemisia_button: Button = $CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer/MedicineButton
-@onready var add_valeriana_button: Button = $CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer/HerbsButton
-@onready var add_salvia_button: Button = $CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer/CreateMedicineButton
-@onready var apply_mixture_button: Button = $CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer/ApplyMixtureButton
-@onready var clear_mixture_button: Button = $CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer/ClearMixtureButton
-@onready var refuse_button: Button = $CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer/RefuseButton
-@onready var collect_herbs_button: Button = $CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer/CollectHerbsButton
-@onready var rest_button: Button = $CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer/RestButton
-@onready var back_button: Button = $CanvasLayer/MarginContainer/ScrollContainer/VBoxContainer/BackButton
+@onready var background_blocker = $CanvasLayer/BackgroundBlocker
+@onready var background_blocker_right = $CanvasLayer/BackgroundBlockerRight
+@onready var background_blocker_left = $CanvasLayer/BackgroundBlockerLeft
 
 var current_mixture := {
 	ResourceManager.ARTEMISIA: 0,
@@ -26,15 +31,20 @@ var current_mixture := {
 
 
 func _ready() -> void:
-	diary_button.pressed.connect(_on_diary_pressed)
+	
+	background_blocker.gui_input.connect(_on_background_clicked)
+	background_blocker_left.gui_input.connect(_on_background_clicked)
+	background_blocker_right.gui_input.connect(_on_background_clicked)
+	
+	action_menu.visible = false
+	world_diary_button.pressed.connect(_on_world_diary_pressed)
 
+	diary_button.pressed.connect(_on_diary_pressed)
 	add_artemisia_button.pressed.connect(_on_add_artemisia_pressed)
 	add_valeriana_button.pressed.connect(_on_add_valeriana_pressed)
 	add_salvia_button.pressed.connect(_on_add_salvia_pressed)
-
 	apply_mixture_button.pressed.connect(_on_apply_mixture_pressed)
 	clear_mixture_button.pressed.connect(_on_clear_mixture_pressed)
-
 	refuse_button.pressed.connect(_on_refuse_pressed)
 	collect_herbs_button.pressed.connect(_on_collect_herbs_pressed)
 	rest_button.pressed.connect(_on_rest_pressed)
@@ -54,6 +64,14 @@ func _configure_button_texts() -> void:
 	collect_herbs_button.text = "Coletar ervas"
 	rest_button.text = "Descansar"
 
+func _on_world_diary_pressed() -> void:
+	action_menu.visible = true
+	_update_ui()
+
+
+func _on_background_clicked(event):
+	if event is InputEventMouseButton and event.pressed:
+		action_menu.visible = false
 
 func _connect_game_state_signals() -> void:
 	if not GameState.day_changed.is_connected(_update_ui):
@@ -71,7 +89,10 @@ func _connect_game_state_signals() -> void:
 
 func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed("ui_cancel"):
-		_on_back_pressed()
+		if action_menu.visible:
+			action_menu.visible = false
+		else:
+			_on_back_pressed()
 
 
 func _update_ui(_value = null) -> void:

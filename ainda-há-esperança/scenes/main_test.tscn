@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://ducpqxxy5nonr"]
+
+[ext_resource type="Script" uid="uid://cyl5u3omk8h7l" path="res://scenes/main_test.gd" id="1_0s8vl"]
+[ext_resource type="Texture2D" uid="uid://btkfel8rqmk3g" path="res://data/assets/main_room_rot.jpg" id="1_pmgw1"]
+[ext_resource type="Texture2D" uid="uid://7aswouq46a0a" path="res://data/assets/diario.png" id="3_fodur"]
+
+[node name="main" type="Node2D" unique_id=249142793]
+script = ExtResource("1_0s8vl")
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=509045052]
+offset_right = 1152.0
+offset_bottom = 648.0
+texture = ExtResource("1_pmgw1")
+expand_mode = 2
+
+[node name="diaryButton" type="TextureButton" parent="TextureRect" unique_id=1316839824]
+layout_mode = 0
+offset_left = 488.0
+offset_top = 526.0
+offset_right = 670.0
+offset_bottom = 633.0
+texture_normal = ExtResource("3_fodur")
+ignore_texture_size = true
+stretch_mode = 0
