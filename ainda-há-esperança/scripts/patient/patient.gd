@@ -38,7 +38,7 @@ var current_health_state: HealthState = HealthState.WAITING
 var was_treated: bool = false
 var was_examined: bool = false
 var is_waiting: bool = true
-
+var sprite_path: String = ""
 
 static func from_dict(data: Dictionary) -> Patient:
 	var patient := Patient.new()
@@ -52,6 +52,7 @@ static func from_dict(data: Dictionary) -> Patient:
 	patient.symptoms.assign(data.get("symptoms", []))
 	patient.correct_treatment = str(data.get("correct_treatment", ""))
 	patient.severity = int(data.get("severity", 0))
+	patient.sprite_path = str(data.get("sprite", ""))
 
 	patient.stress = int(data.get("stress", 0))
 	patient.infection_level = int(data.get("infection_level", patient.severity))

@@ -36,6 +36,8 @@ var family: Dictionary = {}
 
 var game_finished: bool = false
 
+
+
 func _ready() -> void:
 	_setup_managers()
 	disease_manager.load_from_json(DISEASES_JSON_PATH)

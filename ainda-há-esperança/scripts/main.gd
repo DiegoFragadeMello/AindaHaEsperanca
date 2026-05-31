@@ -23,6 +23,9 @@ extends Node2D
 @onready var background_blocker_right = $CanvasLayer/BackgroundBlockerRight
 @onready var background_blocker_left = $CanvasLayer/BackgroundBlockerLeft
 
+@onready var patient_display: Control = $Character
+@onready var patient_sprite: TextureRect = $Character/CharacterSprite
+
 var current_mixture := {
 	ResourceManager.ARTEMISIA: 0,
 	ResourceManager.VALERIANA: 0,
@@ -49,6 +52,7 @@ func _ready() -> void:
 	collect_herbs_button.pressed.connect(_on_collect_herbs_pressed)
 	rest_button.pressed.connect(_on_rest_pressed)
 	back_button.pressed.connect(_on_back_pressed)
+	GameState.patient_changed.connect(_on_patient_changed)
 
 	_configure_button_texts()
 	_connect_game_state_signals()
@@ -67,6 +71,29 @@ func _configure_button_texts() -> void:
 func _on_world_diary_pressed() -> void:
 	action_menu.visible = true
 	_update_ui()
+	
+func _on_patient_changed(_patient) -> void:
+	_update_ui()
+
+func _update_patient_sprite() -> void:
+	var patient = GameState.current_patient
+
+	if patient == null:
+		patient_display.visible = false
+		patient_sprite.texture = null
+		return
+
+	var sprite_path: String = str(patient.sprite_path)
+
+	var texture := load(sprite_path)
+
+	if texture == null:
+		patient_display.visible = false
+		patient_sprite.texture = null
+		return
+
+	patient_sprite.texture = texture
+	patient_display.visible = true
 
 
 func _on_background_clicked(event):
@@ -128,7 +155,7 @@ func _update_ui(_value = null) -> void:
 	symptoms_label.text = "Sintomas: %s" % ", ".join(patient.symptoms)
 
 	_set_patient_buttons_enabled(not patient.was_treated)
-
+	_update_patient_sprite()
 
 func _update_mixture_label() -> void:
 	mixture_label.text = "Mistura: %d Artemísia | %d Valeriana | %d Sálvia (%d/3)" % [

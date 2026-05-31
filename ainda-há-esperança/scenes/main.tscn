@@ -185,3 +185,18 @@ offset_bottom = 631.0
 texture_normal = ExtResource("3_sugp2")
 ignore_texture_size = true
 stretch_mode = 0
+
+[node name="Character" type="Control" parent="." unique_id=1104911426]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="CharacterSprite" type="TextureRect" parent="Character" unique_id=1170115559]
+layout_mode = 0
+offset_left = 464.0
+offset_top = 257.0
+offset_right = 686.0
+offset_bottom = 526.0
+expand_mode = 1
+stretch_mode = 5
