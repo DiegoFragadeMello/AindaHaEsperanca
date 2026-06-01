@@ -14,7 +14,7 @@ const DISEASES_JSON_PATH := "res://data/characters/diseases.json"
 
 
 var diary_entries: Array[String] = []
-var diary_entries_by_day: Dictionary = {}
+var diary_summaries_by_day: Dictionary = {}
 
 var current_day_actions: Array[String] = []
 var current_day_patient_results: Array[String] = []
@@ -36,6 +36,17 @@ var current_patient: Patient = null
 var family: Dictionary = {}
 
 var game_finished: bool = false
+
+
+var diary_logs_by_day := {
+	1: [],
+	2: [],
+	3: [],
+	4: [],
+	5: [],
+	6: [],
+	7: []
+}
 
 
 
@@ -366,10 +377,33 @@ func _write_day_summary(day_finished: int) -> void:
 		for result in current_day_patient_results:
 			text += "- %s\n" % result
 
+	
 	text += "\nTermino o dia cansado, com as mãos manchadas pelo cheiro das ervas e pela dúvida do que fiz."
-
+	
+	diary_summaries_by_day[day_finished] = text
 	add_diary_entry(text)
 
+
+func add_diary_log(text: String) -> void:
+	var day := get_current_day()
+
+	if not diary_logs_by_day.has(day):
+		diary_logs_by_day[day] = []
+
+	diary_logs_by_day[day].append(text)
+
+
+func get_current_day() -> int:
+	if time_manager != null:
+		return time_manager.current_day
+
+	return 1
+
+func get_day_summary(day: int) -> String:
+	return str(diary_summaries_by_day.get(day, ""))
+
+func get_diary_logs_for_day(day: int) -> Array:
+	return diary_logs_by_day.get(day, [])
 
 func get_resource(resource_name: String) -> int:
 	return resource_manager.get_resource(resource_name)
@@ -407,10 +441,7 @@ func add_diary_entry(text: String) -> void:
 	if time_manager != null:
 		day = time_manager.current_day
 
-	if not diary_entries_by_day.has(day):
-		diary_entries_by_day[day] = []
 
-	diary_entries_by_day[day].append(text)
 
 	diary_updated.emit()
 
@@ -420,12 +451,10 @@ func get_save_data() -> Dictionary:
 		"time": time_manager.get_snapshot(),
 		"resources": resource_manager.get_snapshot(),
 		"diary_entries": diary_entries,
-		"diary_entries_by_day": diary_entries_by_day,
 		"family": family_manager.get_snapshot(),
 	}
 
-func get_diary_entries_for_day(day: int) -> Array:
-	return diary_entries_by_day.get(day, [])
+
 
 
 func load_save_data(data: Dictionary) -> void:
@@ -434,7 +463,6 @@ func load_save_data(data: Dictionary) -> void:
 	time_manager.load_snapshot(data.get("time", {}))
 	resource_manager.load_snapshot(data.get("resources", {}))
 	diary_entries.assign(data.get("diary_entries", []))
-	diary_entries_by_day = data.get("diary_entries_by_day", {})
 	family_manager.load_snapshot(data.get("family", {}))
 	disease_manager.load_from_json(DISEASES_JSON_PATH)
 

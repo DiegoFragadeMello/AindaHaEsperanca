@@ -36,193 +36,211 @@ texture = ExtResource("2_sugp2")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="LeftPage" type="VBoxContainer" parent="CanvasLayer/DiaryPanel" unique_id=1935008723]
+[node name="LeftPage" type="Control" parent="CanvasLayer/DiaryPanel" unique_id=296082873]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="LeftContent" type="VBoxContainer" parent="CanvasLayer/DiaryPanel/LeftPage" unique_id=1935008723]
 layout_mode = 0
 offset_left = 153.0
 offset_top = 158.0
 offset_right = 563.0
 offset_bottom = 442.0
 
-[node name="DayLabel" type="Label" parent="CanvasLayer/DiaryPanel/LeftPage" unique_id=619635660]
+[node name="DayLabel" type="Label" parent="CanvasLayer/DiaryPanel/LeftPage/LeftContent" unique_id=619635660]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 26
 text = "Dia 1 de 7"
 
-[node name="TimeLabel" type="Label" parent="CanvasLayer/DiaryPanel/LeftPage" unique_id=1524779479]
+[node name="TimeLabel" type="Label" parent="CanvasLayer/DiaryPanel/LeftPage/LeftContent" unique_id=1524779479]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 17
 text = "Horário: 07:00"
 
-[node name="ResourcesLabel" type="Label" parent="CanvasLayer/DiaryPanel/LeftPage" unique_id=726859582]
+[node name="ResourcesLabel" type="Label" parent="CanvasLayer/DiaryPanel/LeftPage/LeftContent" unique_id=726859582]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 16
 text = "Artemísia: 10 | Valeriana: 10 | Sálvia: 10"
 autowrap_mode = 2
 
-[node name="PatientLabel" type="Label" parent="CanvasLayer/DiaryPanel/LeftPage" unique_id=1824338365]
+[node name="PatientLabel" type="Label" parent="CanvasLayer/DiaryPanel/LeftPage/LeftContent" unique_id=1824338365]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 17
 text = "Paciente"
 autowrap_mode = 2
 
-[node name="SymptomsLabel" type="Label" parent="CanvasLayer/DiaryPanel/LeftPage" unique_id=1232414875]
+[node name="SymptomsLabel" type="Label" parent="CanvasLayer/DiaryPanel/LeftPage/LeftContent" unique_id=1232414875]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 16
 text = "Sintomas"
 autowrap_mode = 2
 
-[node name="MixtureLabel" type="Label" parent="CanvasLayer/DiaryPanel/LeftPage" unique_id=621642007]
+[node name="MixtureLabel" type="Label" parent="CanvasLayer/DiaryPanel/LeftPage/LeftContent" unique_id=621642007]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 16
 text = "Mistura: 0 Artemísia | 0 Valeriana | 0 Sálvia (0/3)"
 autowrap_mode = 2
 
-[node name="Label" type="RichTextLabel" parent="CanvasLayer/DiaryPanel/LeftPage" unique_id=1948376472]
+[node name="DayLogContainer" type="VBoxContainer" parent="CanvasLayer/DiaryPanel/LeftPage" unique_id=1233687632]
+layout_mode = 0
+offset_left = 145.0
+offset_top = 157.0
+offset_right = 556.0
+offset_bottom = 544.0
+
+[node name="SelectedDayLabel" type="Label" parent="CanvasLayer/DiaryPanel/LeftPage/DayLogContainer" unique_id=1405419264]
 layout_mode = 2
 
-[node name="RightPage" type="VBoxContainer" parent="CanvasLayer/DiaryPanel" unique_id=263989851]
+[node name="DayLogLabel" type="RichTextLabel" parent="CanvasLayer/DiaryPanel/LeftPage/DayLogContainer" unique_id=1618307799]
+custom_minimum_size = Vector2(400, 300)
+layout_mode = 2
+
+[node name="backPage" type="Button" parent="CanvasLayer/DiaryPanel/LeftPage/DayLogContainer" unique_id=1143382835]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+text = "Voltar"
+autowrap_trim_flags = 0
+
+[node name="RightPage" type="Control" parent="CanvasLayer/DiaryPanel" unique_id=1610820580]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="rightContent" type="VBoxContainer" parent="CanvasLayer/DiaryPanel/RightPage" unique_id=263989851]
 layout_mode = 0
 offset_left = 696.0
 offset_top = 113.0
 offset_right = 956.0
 offset_bottom = 529.0
 
-[node name="DiaryButton" type="Button" parent="CanvasLayer/DiaryPanel/RightPage" unique_id=1423436638]
+[node name="DiaryButton" type="Button" parent="CanvasLayer/DiaryPanel/RightPage/rightContent" unique_id=1423436638]
 custom_minimum_size = Vector2(260, 38)
 layout_mode = 2
 text = "Ver diário"
 
-[node name="MedicineButton" type="Button" parent="CanvasLayer/DiaryPanel/RightPage" unique_id=1482012444]
+[node name="ArtemisiaButton" type="Button" parent="CanvasLayer/DiaryPanel/RightPage/rightContent" unique_id=1482012444]
 custom_minimum_size = Vector2(260, 38)
 layout_mode = 2
 text = "Adicionar artemísia"
 
-[node name="HerbsButton" type="Button" parent="CanvasLayer/DiaryPanel/RightPage" unique_id=1654502444]
+[node name="ValerianaButton" type="Button" parent="CanvasLayer/DiaryPanel/RightPage/rightContent" unique_id=1654502444]
 custom_minimum_size = Vector2(260, 38)
 layout_mode = 2
 text = "Adicionar valeriana"
 
-[node name="CreateMedicineButton" type="Button" parent="CanvasLayer/DiaryPanel/RightPage" unique_id=231406992]
+[node name="SalviaButton" type="Button" parent="CanvasLayer/DiaryPanel/RightPage/rightContent" unique_id=231406992]
 custom_minimum_size = Vector2(260, 38)
 layout_mode = 2
 text = "Adicionar sálvia"
 
-[node name="ApplyMixtureButton" type="Button" parent="CanvasLayer/DiaryPanel/RightPage" unique_id=2079894953]
+[node name="ApplyMixtureButton" type="Button" parent="CanvasLayer/DiaryPanel/RightPage/rightContent" unique_id=2079894953]
 custom_minimum_size = Vector2(260, 38)
 layout_mode = 2
 text = "Aplicar mistura"
 
-[node name="ClearMixtureButton" type="Button" parent="CanvasLayer/DiaryPanel/RightPage" unique_id=1845698525]
+[node name="ClearMixtureButton" type="Button" parent="CanvasLayer/DiaryPanel/RightPage/rightContent" unique_id=1845698525]
 custom_minimum_size = Vector2(260, 38)
 layout_mode = 2
 text = "Limpar mistura"
 
-[node name="RefuseButton" type="Button" parent="CanvasLayer/DiaryPanel/RightPage" unique_id=360058895]
+[node name="RefuseButton" type="Button" parent="CanvasLayer/DiaryPanel/RightPage/rightContent" unique_id=360058895]
 custom_minimum_size = Vector2(260, 38)
 layout_mode = 2
 text = "Recusar atendimento"
 
-[node name="CollectHerbsButton" type="Button" parent="CanvasLayer/DiaryPanel/RightPage" unique_id=131041764]
+[node name="CollectHerbsButton" type="Button" parent="CanvasLayer/DiaryPanel/RightPage/rightContent" unique_id=131041764]
 custom_minimum_size = Vector2(260, 38)
 layout_mode = 2
 text = "Coletar ervas"
 
-[node name="RestButton" type="Button" parent="CanvasLayer/DiaryPanel/RightPage" unique_id=571949939]
+[node name="RestButton" type="Button" parent="CanvasLayer/DiaryPanel/RightPage/rightContent" unique_id=571949939]
 custom_minimum_size = Vector2(260, 38)
 layout_mode = 2
 text = "Descansar"
 
-[node name="BackButton" type="Button" parent="CanvasLayer/DiaryPanel/RightPage" unique_id=2002851590]
+[node name="BackButton" type="Button" parent="CanvasLayer/DiaryPanel/RightPage/rightContent" unique_id=2002851590]
 custom_minimum_size = Vector2(260, 38)
 layout_mode = 2
 text = "Voltar ao menu"
 
-[node name="pages" type="Node" parent="CanvasLayer/DiaryPanel" unique_id=2003355113]
+[node name="marca_pagina_pages" type="Control" parent="CanvasLayer/DiaryPanel" unique_id=1119935915]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
 
-[node name="page_1" type="Button" parent="CanvasLayer/DiaryPanel/pages" unique_id=512081944]
-offset_left = 121.0
-offset_top = 45.0
-offset_right = 161.0
-offset_bottom = 84.0
-flat = true
+[node name="page_1" type="Button" parent="CanvasLayer/DiaryPanel/marca_pagina_pages" unique_id=2024680993]
+layout_mode = 0
+offset_left = 124.0
+offset_top = 48.0
+offset_right = 159.0
+offset_bottom = 83.0
 
-[node name="page_2" type="Button" parent="CanvasLayer/DiaryPanel/pages" unique_id=591673680]
-offset_left = 162.0
+[node name="page_2" type="Button" parent="CanvasLayer/DiaryPanel/marca_pagina_pages" unique_id=1262724539]
+layout_mode = 0
+offset_left = 163.0
 offset_top = 40.0
-offset_right = 190.0
+offset_right = 191.0
 offset_bottom = 82.0
-flat = true
 
-[node name="page_3" type="Button" parent="CanvasLayer/DiaryPanel/pages" unique_id=814596485]
+[node name="page_3" type="Button" parent="CanvasLayer/DiaryPanel/marca_pagina_pages" unique_id=1808314159]
+layout_mode = 0
 offset_left = 192.0
-offset_top = 41.0
-offset_right = 223.0
+offset_top = 42.0
+offset_right = 221.0
 offset_bottom = 82.0
-flat = true
 
-[node name="page_4" type="Button" parent="CanvasLayer/DiaryPanel/pages" unique_id=95723238]
+[node name="page_4" type="Button" parent="CanvasLayer/DiaryPanel/marca_pagina_pages" unique_id=1672771178]
+layout_mode = 0
 offset_left = 233.0
-offset_top = 35.0
+offset_top = 36.0
 offset_right = 264.0
-offset_bottom = 78.0
-flat = true
+offset_bottom = 80.0
 
-[node name="page_5" type="Button" parent="CanvasLayer/DiaryPanel/pages" unique_id=1792224024]
-offset_left = 271.0
+[node name="page_5" type="Button" parent="CanvasLayer/DiaryPanel/marca_pagina_pages" unique_id=1074856013]
+layout_mode = 0
+offset_left = 270.0
 offset_top = 25.0
 offset_right = 303.0
-offset_bottom = 70.0
-flat = true
+offset_bottom = 71.0
 
-[node name="page_6" type="Button" parent="CanvasLayer/DiaryPanel/pages" unique_id=1970491213]
-offset_left = 306.0
-offset_top = 26.0
-offset_right = 335.0
-offset_bottom = 63.0
-flat = true
+[node name="page_6" type="Button" parent="CanvasLayer/DiaryPanel/marca_pagina_pages" unique_id=1739093793]
+layout_mode = 0
+offset_left = 304.0
+offset_top = 25.0
+offset_right = 336.0
+offset_bottom = 66.0
 
-[node name="page_main" type="Button" parent="CanvasLayer/DiaryPanel/pages" unique_id=1898367743]
+[node name="page_7" type="Button" parent="CanvasLayer/DiaryPanel/marca_pagina_pages" unique_id=1555017697]
+layout_mode = 0
 offset_left = 351.0
 offset_top = 10.0
-offset_right = 384.0
+offset_right = 385.0
 offset_bottom = 55.0
-flat = true
 
-[node name="BackgroundBlockerLeft" type="ColorRect" parent="CanvasLayer" unique_id=900475931]
+[node name="BackgroundBlockerLeft" type="ColorRect" parent="." unique_id=900475931]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 1.0
-offset_top = 1.0
-offset_right = -1037.0
+offset_right = 102.0
+offset_bottom = 649.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0)
 
-[node name="BackgroundBlockerRight" type="ColorRect" parent="CanvasLayer" unique_id=158071662]
+[node name="BackgroundBlockerRight" type="ColorRect" parent="." unique_id=158071662]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 1042.0
-offset_top = 3.0
-offset_bottom = -2.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0, 0, 0, 0)
-
-[node name="BackgroundBlocker" type="ColorRect" parent="CanvasLayer" unique_id=2075019043]
-visible = false
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_right = 88.0
-offset_bottom = 91.0
+offset_left = 1063.0
+offset_right = 1152.0
+offset_bottom = 648.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0)
