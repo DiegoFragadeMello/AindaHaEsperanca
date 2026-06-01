@@ -2,7 +2,10 @@
 
 [ext_resource type="Script" uid="uid://dsc7ujnj3pg4j" path="res://scripts/main.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://btkfel8rqmk3g" path="res://data/assets/main_room_rot.jpg" id="2_0wfyh"]
-[ext_resource type="Texture2D" uid="uid://7aswouq46a0a" path="res://data/assets/diario.png" id="3_sugp2"]
+[ext_resource type="Texture2D" uid="uid://cfivvd7qg3nbx" path="res://data/assets/diario_img/diario_1.png" id="2_sugp2"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_sugp2"]
+load_path = "res://.godot/imported/diario.png-52b5e54487dbc21328d10bf0b316daaa.ctex"
 
 [node name="Main" type="Node2D" unique_id=325692335]
 script = ExtResource("1")
@@ -29,16 +32,16 @@ offset_bottom = -2.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("3_sugp2")
+texture = ExtResource("2_sugp2")
 expand_mode = 1
 stretch_mode = 5
 
 [node name="LeftPage" type="VBoxContainer" parent="CanvasLayer/DiaryPanel" unique_id=1935008723]
 layout_mode = 0
-offset_left = 287.0
-offset_top = 90.0
-offset_right = 531.0
-offset_bottom = 575.0
+offset_left = 153.0
+offset_top = 158.0
+offset_right = 563.0
+offset_bottom = 442.0
 
 [node name="DayLabel" type="Label" parent="CanvasLayer/DiaryPanel/LeftPage" unique_id=619635660]
 layout_mode = 2
@@ -80,12 +83,15 @@ theme_override_font_sizes/font_size = 16
 text = "Mistura: 0 Artemísia | 0 Valeriana | 0 Sálvia (0/3)"
 autowrap_mode = 2
 
+[node name="Label" type="RichTextLabel" parent="CanvasLayer/DiaryPanel/LeftPage" unique_id=1948376472]
+layout_mode = 2
+
 [node name="RightPage" type="VBoxContainer" parent="CanvasLayer/DiaryPanel" unique_id=263989851]
 layout_mode = 0
-offset_left = 597.0
-offset_top = 69.0
-offset_right = 876.0
-offset_bottom = 577.0
+offset_left = 696.0
+offset_top = 113.0
+offset_right = 956.0
+offset_bottom = 529.0
 
 [node name="DiaryButton" type="Button" parent="CanvasLayer/DiaryPanel/RightPage" unique_id=1423436638]
 custom_minimum_size = Vector2(260, 38)
@@ -137,13 +143,64 @@ custom_minimum_size = Vector2(260, 38)
 layout_mode = 2
 text = "Voltar ao menu"
 
+[node name="pages" type="Node" parent="CanvasLayer/DiaryPanel" unique_id=2003355113]
+
+[node name="page_1" type="Button" parent="CanvasLayer/DiaryPanel/pages" unique_id=512081944]
+offset_left = 121.0
+offset_top = 45.0
+offset_right = 161.0
+offset_bottom = 84.0
+flat = true
+
+[node name="page_2" type="Button" parent="CanvasLayer/DiaryPanel/pages" unique_id=591673680]
+offset_left = 162.0
+offset_top = 40.0
+offset_right = 190.0
+offset_bottom = 82.0
+flat = true
+
+[node name="page_3" type="Button" parent="CanvasLayer/DiaryPanel/pages" unique_id=814596485]
+offset_left = 192.0
+offset_top = 41.0
+offset_right = 223.0
+offset_bottom = 82.0
+flat = true
+
+[node name="page_4" type="Button" parent="CanvasLayer/DiaryPanel/pages" unique_id=95723238]
+offset_left = 233.0
+offset_top = 35.0
+offset_right = 264.0
+offset_bottom = 78.0
+flat = true
+
+[node name="page_5" type="Button" parent="CanvasLayer/DiaryPanel/pages" unique_id=1792224024]
+offset_left = 271.0
+offset_top = 25.0
+offset_right = 303.0
+offset_bottom = 70.0
+flat = true
+
+[node name="page_6" type="Button" parent="CanvasLayer/DiaryPanel/pages" unique_id=1970491213]
+offset_left = 306.0
+offset_top = 26.0
+offset_right = 335.0
+offset_bottom = 63.0
+flat = true
+
+[node name="page_main" type="Button" parent="CanvasLayer/DiaryPanel/pages" unique_id=1898367743]
+offset_left = 351.0
+offset_top = 10.0
+offset_right = 384.0
+offset_bottom = 55.0
+flat = true
+
 [node name="BackgroundBlockerLeft" type="ColorRect" parent="CanvasLayer" unique_id=900475931]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 1.0
 offset_top = 1.0
-offset_right = -983.0
+offset_right = -1037.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0)
@@ -152,7 +209,7 @@ color = Color(0, 0, 0, 0)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 969.0
+offset_left = 1042.0
 offset_top = 3.0
 offset_bottom = -2.0
 grow_horizontal = 2
@@ -182,7 +239,7 @@ offset_left = 476.0
 offset_top = 519.0
 offset_right = 680.0
 offset_bottom = 631.0
-texture_normal = ExtResource("3_sugp2")
+texture_normal = SubResource("CompressedTexture2D_sugp2")
 ignore_texture_size = true
 stretch_mode = 0
 

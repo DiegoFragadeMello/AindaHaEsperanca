@@ -26,6 +26,22 @@ extends Node2D
 @onready var patient_display: Control = $Character
 @onready var patient_sprite: TextureRect = $Character/CharacterSprite
 
+@onready var page_1 = $CanvasLayer/DiaryPanel/pages/page_1
+@onready var page_2 = $CanvasLayer/DiaryPanel/pages/page_2
+@onready var page_3 = $CanvasLayer/DiaryPanel/pages/page_3
+@onready var page_4 = $CanvasLayer/DiaryPanel/pages/page_4
+@onready var page_5 = $CanvasLayer/DiaryPanel/pages/page_5
+@onready var page_6 = $CanvasLayer/DiaryPanel/pages/page_6
+@onready var page_7 = $CanvasLayer/DiaryPanel/pages/page_main
+@onready var day_log_label: RichTextLabel = $CanvasLayer/DiaryPanel/LeftPage/Label
+
+
+
+
+
+
+
+
 var current_mixture := {
 	ResourceManager.ARTEMISIA: 0,
 	ResourceManager.VALERIANA: 0,
@@ -53,6 +69,15 @@ func _ready() -> void:
 	rest_button.pressed.connect(_on_rest_pressed)
 	back_button.pressed.connect(_on_back_pressed)
 	GameState.patient_changed.connect(_on_patient_changed)
+
+	page_1.pressed.connect(func(): _show_day_log(1))
+	page_2.pressed.connect(func(): _show_day_log(2))
+	page_3.pressed.connect(func(): _show_day_log(3))
+	page_4.pressed.connect(func(): _show_day_log(4))
+	page_5.pressed.connect(func(): _show_day_log(5))
+	page_6.pressed.connect(func(): _show_day_log(6))
+	page_7.pressed.connect(func(): _show_day_log(7))
+
 
 	_configure_button_texts()
 	_connect_game_state_signals()
@@ -177,6 +202,23 @@ func _set_patient_buttons_enabled(enabled: bool) -> void:
 	clear_mixture_button.disabled = mixture_total == 0
 
 	refuse_button.disabled = not enabled
+
+
+func _show_day_log(day: int) -> void:
+	if day > GameState.current_day:
+		return
+
+	var entries := GameState.get_diary_entries_for_day(day)
+
+	if entries.is_empty():
+		return
+
+	var text := "Dia %d\n\n" % day
+
+	for entry in entries:
+		text += "%s\n\n" % entry
+
+	day_log_label.text = text
 
 
 func _get_current_mixture_total() -> int:
