@@ -11,6 +11,9 @@ var patient_queue: Array[Patient] = []
 var treated_patients: Array[Patient] = []
 var refused_patients: Array[Patient] = []
 var dead_patients: Array[Patient] = []
+var all_patients_seen: Array[Patient] = []
+
+var total_campaign_patients: int = 0
 
 
 func reset() -> void:
@@ -19,13 +22,27 @@ func reset() -> void:
 	treated_patients.clear()
 	refused_patients.clear()
 	dead_patients.clear()
+	all_patients_seen.clear()
+	total_campaign_patients = 0
 	patient_changed.emit(null)
+
+
+func load_total_campaign_patients(path: String = DEFAULT_PATIENTS_PATH) -> void:
+	var data := JsonDataLoader.load_json(path)
+	var days: Dictionary = data.get("days", {})
+
+	total_campaign_patients = 0
+
+	for day_key in days.keys():
+		var day_patients: Array = days.get(day_key, [])
+		total_campaign_patients += day_patients.size()
 
 
 func load_patients_from_json(day: int, path: String = DEFAULT_PATIENTS_PATH) -> void:
 	var data := JsonDataLoader.load_json(path)
 	var days: Dictionary = data.get("days", {})
 	var day_data: Array = days.get(str(day), [])
+
 	load_patients_for_day(day_data)
 
 
@@ -33,13 +50,14 @@ func load_patients_for_day(day_data: Array) -> void:
 	patient_queue.clear()
 	current_patient = null
 
-	for data in day_data:
-		if typeof(data) != TYPE_DICTIONARY:
+	for raw_patient_data in day_data:
+		if typeof(raw_patient_data) != TYPE_DICTIONARY:
 			push_warning("Paciente ignorado: entrada inválida no JSON.")
 			continue
 
-		var patient: Patient = Patient.from_dict(data)
+		var patient: Patient = Patient.from_dict(raw_patient_data)
 		patient_queue.append(patient)
+		_add_unique_patient(all_patients_seen, patient)
 
 	call_next_patient()
 
@@ -54,6 +72,7 @@ func call_next_patient() -> Patient:
 	current_patient = patient_queue.pop_front()
 	current_patient.is_waiting = false
 	patient_changed.emit(current_patient)
+
 	return current_patient
 
 
@@ -71,6 +90,7 @@ func treat_current_patient_with_herbs(recipe_name: String, outcome: String) -> P
 
 	current_patient = null
 	call_next_patient()
+
 	return result
 
 
@@ -91,16 +111,34 @@ func refuse_current_patient() -> void:
 
 func progress_all_patients() -> void:
 	for patient in patient_queue:
-		patient.progress_disease()
-
-		if patient.current_health_state == Patient.HealthState.DEAD:
-			_add_unique_patient(dead_patients, patient)
+		_progress_patient(patient)
 
 	if current_patient != null:
-		current_patient.progress_disease()
+		_progress_patient(current_patient)
 
-		if current_patient.current_health_state == Patient.HealthState.DEAD:
-			_add_unique_patient(dead_patients, current_patient)
+
+func has_current_patient() -> bool:
+	return current_patient != null
+
+
+func has_any_living_patient_seen() -> bool:
+	for patient in all_patients_seen:
+		if patient.current_health_state != Patient.HealthState.DEAD:
+			return true
+
+	return false
+
+
+func get_unresolved_patients() -> Array[Patient]:
+	var patients: Array[Patient] = []
+
+	for patient in patient_queue:
+		patients.append(patient)
+
+	if current_patient != null:
+		patients.append(current_patient)
+
+	return patients
 
 
 func get_queue_count() -> int:
@@ -123,6 +161,24 @@ func get_resolved_count() -> int:
 	return treated_patients.size() + refused_patients.size()
 
 
+func get_total_known_patients_count() -> int:
+	return all_patients_seen.size()
+
+
+func get_total_campaign_patients_count() -> int:
+	return total_campaign_patients
+
+
+func get_survived_count() -> int:
+	var count := 0
+
+	for patient in all_patients_seen:
+		if patient.current_health_state != Patient.HealthState.DEAD:
+			count += 1
+
+	return count
+
+
 func get_patient_statistics() -> Dictionary:
 	return {
 		"treated": get_treated_count(),
@@ -134,13 +190,30 @@ func get_patient_statistics() -> Dictionary:
 	}
 
 
+func get_final_statistics() -> Dictionary:
+	return {
+		"total": get_total_campaign_patients_count(),
+		"seen": get_total_known_patients_count(),
+		"survived": get_survived_count(),
+		"dead": get_dead_count(),
+		"treated": get_treated_count(),
+		"refused": get_refused_count(),
+	}
+
+
+func _progress_patient(patient: Patient) -> void:
+	if patient == null:
+		return
+
+	patient.progress_disease()
+
+	if patient.current_health_state == Patient.HealthState.DEAD:
+		_add_unique_patient(dead_patients, patient)
+
+
 func _add_unique_patient(target: Array[Patient], patient: Patient) -> void:
 	if patient == null:
 		return
 
 	if not target.has(patient):
 		target.append(patient)
-
-
-func has_current_patient() -> bool:
-	return current_patient != null

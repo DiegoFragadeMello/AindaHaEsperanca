@@ -85,23 +85,19 @@ func examine() -> Array[String]:
 	return symptoms
 
 
-func apply_herbal_treatment(recipe_name: String, outcome: String) -> HealthState:
+func apply_herbal_treatment(_recipe_name: String, outcome: String) -> HealthState:
 	was_treated = true
 	is_waiting = false
 
 	match outcome:
 		"good":
 			_apply_good_outcome()
-
 		"neutral":
 			_apply_neutral_outcome()
-
 		"bad":
 			_apply_bad_outcome()
-
 		"deadly":
 			_apply_deadly_outcome()
-
 		_:
 			_apply_bad_outcome()
 
@@ -236,3 +232,18 @@ func get_patient_summary() -> Dictionary:
 		"examined": was_examined,
 		"severity": severity,
 	}
+
+func is_dead() -> bool:
+	return current_health_state == HealthState.DEAD
+
+
+func is_alive() -> bool:
+	return not is_dead()
+
+
+func is_resolved() -> bool:
+	return current_health_state in [
+		HealthState.DEAD,
+		HealthState.RECOVERED,
+		HealthState.STABILIZED,
+	]

@@ -113,18 +113,22 @@ func _on_patient_changed(_patient) -> void:
 	_update_ui()
 
 func _update_patient_sprite() -> void:
-	var patient = GameState.current_patient
+	var patient := GameState.get_current_patient()
 
 	if patient == null:
 		patient_display.visible = false
 		patient_sprite.texture = null
 		return
 
-	var sprite_path: String = str(patient.sprite_path)
+	if patient.sprite_path.strip_edges().is_empty():
+		patient_display.visible = false
+		patient_sprite.texture = null
+		return
 
-	var texture := load(sprite_path)
+	var texture := load(patient.sprite_path)
 
 	if texture == null:
+		push_warning("Sprite de paciente não encontrado: %s" % patient.sprite_path)
 		patient_display.visible = false
 		patient_sprite.texture = null
 		return
@@ -165,27 +169,37 @@ func _process(_delta: float) -> void:
 
 
 func _update_ui(_value = null) -> void:
+	_update_day_and_time_labels()
+	_update_resource_label()
+	_update_mixture_label()
+	_update_patient_panel()
+
+
+func _update_day_and_time_labels() -> void:
 	day_label.text = "Dia %d de %d" % [
-		GameState.current_day,
+		GameState.get_current_day(),
 		GameState.time_manager.max_days,
 	]
 
-	time_label.text = "Horário: %02d:00" % GameState.current_hour
+	time_label.text = "Horário: %02d:00" % GameState.get_current_hour()
 
+
+func _update_resource_label() -> void:
 	resources_label.text = "Artemísia: %d | Valeriana: %d | Sálvia: %d" % [
-		GameState.artemisia,
-		GameState.valeriana,
-		GameState.salvia,
+		GameState.get_artemisia(),
+		GameState.get_valeriana(),
+		GameState.get_salvia(),
 	]
 
-	_update_mixture_label()
 
-	var patient: Patient = GameState.current_patient
+func _update_patient_panel() -> void:
+	var patient := GameState.get_current_patient()
 
 	if patient == null:
 		patient_label.text = "Nenhum paciente aguardando."
 		symptoms_label.text = ""
 		_set_patient_buttons_enabled(false)
+		_update_patient_sprite()
 		return
 
 	patient_label.text = "Paciente: %s\n%s\nEstado: %s" % [
@@ -224,20 +238,13 @@ func _set_patient_buttons_enabled(enabled: bool) -> void:
 func _show_day_summary(day: int) -> void:
 	selected_day_label.text = "Diário - Dia %d" % day
 
-	var current_day := GameState.get_current_day()
-
-	if day >= current_day:
-		day_log_label.text = "O registro deste dia ainda não foi finalizado."
-		return
-
 	var summary := GameState.get_day_summary(day)
 
 	if summary.is_empty():
-		day_log_label.text = "Nenhum registro final foi escrito para este dia."
-		return
+		day_log_label.text = "O registro deste dia ainda não foi finalizado."
+	else:
+		day_log_label.text = summary
 
-	day_log_label.text = summary
-	
 	current_info_container.visible = false
 	day_log_container.visible = true
 
